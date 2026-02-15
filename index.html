@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Lange's Deli">
+  <meta name="theme-color" content="#C23B22">
+  <meta name="description" content="Order from Lange's Little Store & Delicatessen — Chappaqua's favorite deli since 1965">
+  <title>Lange's Deli</title>
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23C23B22' width='180' height='180' rx='40'/><text x='90' y='105' font-size='60' font-family='Georgia,serif' fill='white' text-anchor='middle' font-weight='bold'>L's</text></svg>">
+  <link rel="manifest" href="data:application/json,{%22name%22:%22Lange's Little Store%22,%22short_name%22:%22Lange's Deli%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23FFFFFF%22,%22theme_color%22:%22%23C23B22%22,%22orientation%22:%22portrait%22}">
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; padding: 0;
+      overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+    }
+    body { overscroll-behavior-y: contain; }
+    .scroll-area { -webkit-overflow-scrolling: touch; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'deli-red': '#C23B22',
+            'mustard': '#D4A843',
+            'forest': '#2D5016',
+            'warm-cream': '#FDF6EC',
+            'paper': '#F5EDE0',
+            'ios-gray': '#F2F2F7',
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script type="text/babel">
+    /* ============================================================
+       ICON HELPER
+       ============================================================ */
+    function Icon({ name, size, color, strokeWidth }) {
+      var s = size || 24;
+      var c = color || "currentColor";
+      var sw = strokeWidth || 1.5;
+      var ref = React.useRef(null);
+      React.useEffect(function() {
+        if (ref.current && lucide.icons[name]) {
+          ref.current.innerHTML = '';
+          var svg = lucide.icons[name].toSvg({ width: s, height: s, color: c, 'stroke-width': sw });
+          ref.current.innerHTML = svg;
+        }
+      }, [name, s, c, sw]);
+      return React.createElement('span', {
+        ref: ref,
+        style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: s, height: s }
+      });
+    }
+
+    /* ============================================================
+       DATA CONSTANTS
+       ============================================================ */
+
+    var STORE_HOURS = {
+      0: { open: "6:00 AM", close: "3:00 PM", openMin: 360, closeMin: 900 },
+      1: { open: "6:00 AM", close: "6:00 PM", openMin: 360, closeMin: 1080 },
+      2: { open: "6:00 AM", close: "6:00 PM", openMin: 360, closeMin: 1080 },
+      3: { open: "6:00 AM", close: "6:00 PM", openMin: 360, closeMin: 1080 },
+      4: { open: "6:00 AM", close: "6:00 PM", openMin: 360, closeMin: 1080 },
+      5: { open: "6:00 AM", close: "6:00 PM", openMin: 360, closeMin: 1080 },
+      6: { open: "6:00 AM", close: "6:00 PM", openMin: 360, closeMin: 1080 }
+    };
+
+    var STORE_INFO = {
+      name: "Lange's Little Store & Delicatessen",
+      shortName: "Lange's",
+      address: "382 King Street, Chappaqua, NY 10514",
+      phone: "(914) 238-3553",
+      fax: "(914) 238-1321",
+      text: "(914) 380-3532",
+      website: "langeslittlestore.com",
+      instagram: "@langes10514",
+      tagline: "Since 1965 \u00B7 Chappaqua, NY",
+      established: 1965
+    };
+
+    var HOT_FOODS = [
+      { id: "hf-1", name: "Baked Chicken" },
+      { id: "hf-2", name: "BBQ Ribs" },
+      { id: "hf-3", name: "Boneless Pork Chops" },
+      { id: "hf-4", name: "Bratwurst & Kraut" },
+      { id: "hf-5", name: "Baked Ziti" },
+      { id: "hf-6", name: "Beef Goulash" },
+      { id: "hf-7", name: "Beef Stew" },
+      { id: "hf-8", name: "Calamari" },
+      { id: "hf-9", name: "Chicken Cordon Bleu" },
+      { id: "hf-10", name: "Chicken Piccata" },
+      { id: "hf-11", name: "Chicken Dijon" },
+      { id: "hf-12", name: "Chicken Paprikash" },
+      { id: "hf-13", name: "Chicken Marsala" },
+      { id: "hf-14", name: "Chicken Francaise" },
+      { id: "hf-15", name: "Chicken Parmesan" },
+      { id: "hf-16", name: "Flank Steak" },
+      { id: "hf-17", name: "Flounder Fillet" },
+      { id: "hf-18", name: "Stuffed Flounder" },
+      { id: "hf-19", name: "Flounder Francaise" },
+      { id: "hf-20", name: "London Broil" },
+      { id: "hf-21", name: "Mac-N-Cheese" },
+      { id: "hf-22", name: "Pork Chops" },
+      { id: "hf-23", name: "Meat Lasagna" },
+      { id: "hf-24", name: "Pulled Pork" },
+      { id: "hf-25", name: "Pork Tenderloin" },
+      { id: "hf-26", name: "Pasta Rustico" },
+      { id: "hf-27", name: "Pasta Carbonara" },
+      { id: "hf-28", name: "Pasta Bolognese" },
+      { id: "hf-29", name: "Pot Roast" },
+      { id: "hf-30", name: "Pepper Steak" },
+      { id: "hf-31", name: "Potato Casserole" },
+      { id: "hf-32", name: "Pasta Milanese" },
+      { id: "hf-33", name: "Pasta Chicken with Broccoli" },
+      { id: "hf-34", name: "Rice" },
+      { id: "hf-35", name: "Stuffed Shells" },
+      { id: "hf-36", name: "Sausage & Peppers" },
+      { id: "hf-37", name: "Mashed Potatoes" },
+      { id: "hf-38", name: "Seafood Pasta" },
+      { id: "hf-39", name: "Tilapia" }
+    ];
+
+    var HOT_SANDWICHES = [
+      { id: "hs-1", name: "Chicken Parmigiana", description: "Breaded chicken cutlet with marinara and melted mozzarella" },
+      { id: "hs-2", name: "Eggplant Parmigiana", description: "Breaded eggplant with marinara and melted mozzarella" },
+      { id: "hs-3", name: "Meatball Parmigiana", description: "Homemade meatballs with marinara and melted mozzarella" },
+      { id: "hs-4", name: "Philly Cheese Steak", description: "Shaved steak with melted cheese and saut\u00E9ed onions" },
+      { id: "hs-5", name: "Chicken Philly Cheese", description: "Grilled chicken, American cheese, saut\u00E9ed onions & roasted peppers" },
+      { id: "hs-6", name: "Mexican Cheese Steak", description: "Steak, pepper jack cheese, hot peppers & onions" },
+      { id: "hs-7", name: "Reuben Sandwich", description: "Corned beef or pastrami, Swiss cheese, sauerkraut & Russian dressing" }
+    ];
+
+    var SIGNATURE_SANDWICHES = [
+      { id: "ss-1", name: "Baked Eggplant Wrap", description: "Breaded eggplant, fresh mozzarella, roasted peppers & balsamic vinegar", popular: false },
+      { id: "ss-2", name: "The Black Forest Wrap", description: "Smoked turkey, muenster cheese, coleslaw & Russian dressing", popular: false },
+      { id: "ss-3", name: "The Bourbon Street", description: "Chicken cutlet, cheddar cheese, red onion, lettuce, tomato, blue cheese dressing", popular: false },
+      { id: "ss-4", name: "Blazing Buffalo Chicken Sandwich", description: "Blazing buffalo chicken, lettuce, tomato, red onions & bleu cheese dressing", popular: false },
+      { id: "ss-5", name: "California Sun Wrap", description: "Chicken cutlet, pepper jack cheese, avocado, onions, lettuce, tomato & ranch", popular: false },
+      { id: "ss-6", name: "Caprese Panini", description: "Fresh mozzarella, roasted peppers, and balsamic vinegar", popular: false },
+      { id: "ss-7", name: "Chicken Cordon Bleu Panini", description: "Chicken cutlet, Virginia ham, Swiss cheese & honey mustard", popular: false },
+      { id: "ss-8", name: "Cuban Sandwich", description: "Fresh roast pork, deluxe ham, Swiss cheese, pickles & mayo, grilled on a panini press", popular: true },
+      { id: "ss-9", name: "The Chipotle Chicken Wrap", description: "Chipotle chicken, 3 pepper colby jack cheese, avocado, lettuce, tomato, onion & ranch", popular: true },
+      { id: "ss-10", name: "Full House Ovengold Wrap", description: "Ovengold turkey, bacon, Swiss cheese, avocado, red onion, lettuce, tomato & mayo", popular: true },
+      { id: "ss-11", name: "Green Chicken Panini", description: "Grilled chicken, fresh mozzarella, roasted red peppers or sundried tomatoes & balsamic vinaigrette", popular: false },
+      { id: "ss-12", name: "Grilled Pavo", description: "Grilled chicken breast, Virginia ham, pepper jack cheese, lettuce & Russian dressing", popular: false },
+      { id: "ss-13", name: "The King Street", description: "Chicken cutlet, crispy bacon, melted mozzarella & roasted peppers", popular: true },
+      { id: "ss-14", name: "The Jerk Turkey", description: "Jerk turkey, 3 pepper colby jack cheese, avocado, roasted peppers, lettuce, tomato & mayo", popular: false },
+      { id: "ss-15", name: "Margherita Panini", description: "Fresh mozzarella, plum tomato, fresh basil & olive oil", popular: false },
+      { id: "ss-16", name: "Monte Christo Panini", description: "Ovengold turkey, deluxe ham, Swiss cheese, lettuce, tomato & honey mustard", popular: false },
+      { id: "ss-17", name: "Mexican Chicken Wrap", description: "Grilled chicken, 3 pepper colby jack cheese, avocado, pico de gallo, lettuce & ranch", popular: false },
+      { id: "ss-18", name: "Ranchero Wrap", description: "Blazing buffalo chicken, pepper jack cheese, saut\u00E9ed onions, lettuce, tomato, bacon, avocado & mayo", popular: false },
+      { id: "ss-19", name: "Roast Pork Sandwich", description: "Pork, mozzarella & roasted peppers on garlic bread", popular: false },
+      { id: "ss-20", name: "The South Greeley Wrap", description: "Chicken cutlet, bacon, melted Swiss cheese, lettuce, onion & mayo", popular: true },
+      { id: "ss-21", name: "Spicy Combo Wrap", description: "Chipotle chicken, jerk turkey, 3 pepper colby jack, lettuce, tomato, onions & blue cheese dressing", popular: false },
+      { id: "ss-22", name: "The Yellow Stone", description: "Ovengold turkey, deluxe roast beef, tomato, red onions & Russian dressing", popular: false }
+    ];
+
+    var BREAKFAST_ITEMS = [
+      { id: "br-1", name: "Eggs on a Roll or Wrap", description: "All sandwiches made with 2 eggs. Add cheese, sausage, ham, or bacon." },
+      { id: "br-2", name: "Eggs on a Hero", description: "All sandwiches made with 2 eggs. Add cheese, sausage, ham, or bacon." },
+      { id: "br-3", name: "Pancakes", description: "Add bacon, ham, sausage, or bananas" },
+      { id: "br-4", name: "French Toast", description: "Add bacon, ham, or sausage" },
+      { id: "br-5", name: "Breakfast Lox Special", description: "Nova Scotia lox, cream cheese, lettuce, tomato and onions on a bagel, rye, or wrap" },
+      { id: "br-6", name: "Create Your Own Omelette", description: "Three eggs with your choice of 2 items: peppers, onions, broccoli, tomato, spinach, cheese, ham, bacon" },
+      { id: "br-7", name: "Donut" },
+      { id: "br-8", name: "Danish", description: "Available with cream cheese" },
+      { id: "br-9", name: "Roll or Bagel", description: "With butter or cream cheese" },
+      { id: "br-10", name: "Muffin", description: "Available with butter" }
+    ];
+
+    var GRILL_ITEMS = [
+      { id: "gr-1", name: "Hot Dog" },
+      { id: "gr-2", name: "Chicken Wings" },
+      { id: "gr-3", name: "French Fries" },
+      { id: "gr-4", name: "Grilled Cheese", description: "Add ham or bacon" },
+      { id: "gr-5", name: "Chicken Quesadilla", description: "With lettuce, tomato, guacamole, salsa & sour cream" },
+      { id: "gr-6", name: "Hamburger" },
+      { id: "gr-7", name: "Cheeseburger", description: "Add bacon" },
+      { id: "gr-8", name: "Mexican Burger" },
+      { id: "gr-9", name: "Cowboy Burger", description: "With bacon, cheddar, grilled onion & BBQ sauce" }
+    ];
+
+    var SALADS = [
+      { id: "sa-1", name: "3 Bean Salad" },
+      { id: "sa-2", name: "Beets" },
+      { id: "sa-3", name: "Black Beans & Corn" },
+      { id: "sa-4", name: "Broccoli & Cucumbers" },
+      { id: "sa-5", name: "Chicken Fiesta Salad" },
+      { id: "sa-6", name: "Chicken Salad" },
+      { id: "sa-7", name: "Cucumber Salad" },
+      { id: "sa-8", name: "Egg Salad" },
+      { id: "sa-9", name: "Fruit Salad" },
+      { id: "sa-10", name: "Health Salad" },
+      { id: "sa-11", name: "Macaroni Salad" },
+      { id: "sa-12", name: "Mixed Salad" },
+      { id: "sa-13", name: "Potato Salad" },
+      { id: "sa-14", name: "Seafood Salad" },
+      { id: "sa-15", name: "Spa Tuna Salad" },
+      { id: "sa-16", name: "Tomato Salad" },
+      { id: "sa-17", name: "Tortellini Salad" },
+      { id: "sa-18", name: "Tuna Salad" },
+      { id: "sa-19", name: "Nova" },
+      { id: "sa-20", name: "Bread Pudding" },
+      { id: "sa-21", name: "Rice Pudding" }
+    ];
+
+    var SPECIALTY_SALADS = [
+      { id: "sp-1", name: "Buffalo Salad" },
+      { id: "sp-2", name: "Chef Salad" },
+      { id: "sp-3", name: "Chopped Salad" },
+      { id: "sp-4", name: "Classic Caesar Salad" },
+      { id: "sp-5", name: "Cobb Salad" },
+      { id: "sp-6", name: "Grilled Chicken Spinach Salad" },
+      { id: "sp-7", name: "House Salad" },
+      { id: "sp-8", name: "Build Your Own Salad" }
+    ];
+
+    var BREAKFAST_SIDES = [
+      { id: "bs-1", name: "Hash Browns" },
+      { id: "bs-2", name: "Bacon" },
+      { id: "bs-3", name: "Sausage" }
+    ];
+
+    var CATERING_CATEGORIES = [
+      { id: "cat-1", name: "Hors d'Oeuvres", description: "Assorted appetizer platters" },
+      { id: "cat-2", name: "Cheese & Meat Platters", description: "Curated deli meat and cheese displays" },
+      { id: "cat-3", name: "Salads", description: "Fresh-made salads in large format" },
+      { id: "cat-4", name: "Hero Subs (2ft\u20136ft)", description: "Giant hero sandwiches for groups" },
+      { id: "cat-5", name: "Sandwich Platters", description: "Assorted sandwich selections" },
+      { id: "cat-6", name: "Wrap Platters", description: "Assorted wrap selections" },
+      { id: "cat-7", name: "Hot Entr\u00E9es", description: "Full-sized hot dishes for events" },
+      { id: "cat-8", name: "Whole Chicken, Turkey & Hams", description: "Whole roasted proteins" }
+    ];
+
+    var BYO_OPTIONS = {
+      bread: ["Roll", "Hero / Wedge", "Wrap", "Rye", "Whole Wheat", "Bagel", "Panini Press"],
+      meat: ["Roast Beef (House Roasted)", "Ovengold Turkey", "Smoked Turkey", "Jerk Turkey", "Virginia Ham", "Deluxe Ham", "Pastrami", "Corned Beef", "Salami", "Fresh Turkey", "Chicken Cutlet", "Grilled Chicken"],
+      cheese: ["American", "Swiss", "Provolone", "Mozzarella", "Fresh Mozzarella", "Pepper Jack", "3-Pepper Colby Jack", "Cheddar", "Muenster", "No Cheese"],
+      toppings: ["Lettuce", "Tomato", "Onion", "Red Onion", "Roasted Peppers", "Hot Peppers", "Pickles", "Sauerkraut", "Coleslaw", "Avocado", "Bacon", "Sundried Tomatoes"],
+      condiments: ["Mayo", "Mustard", "Honey Mustard", "Russian Dressing", "Blue Cheese Dressing", "Ranch", "Balsamic Vinegar", "Olive Oil", "Ketchup", "Salt & Pepper"]
+    };
+
+    var MENU_CATEGORIES = [
+      { key: "hotFoods", label: "Hot Foods", icon: "flame", data: HOT_FOODS, note: "Hot foods change daily" },
+      { key: "hotSandwiches", label: "Hot Sandwiches", icon: "utensils", data: HOT_SANDWICHES, note: "All wedges extra" },
+      { key: "signatures", label: "Signatures", icon: "star", data: SIGNATURE_SANDWICHES, note: "All wedges extra" },
+      { key: "breakfast", label: "Breakfast", icon: "coffee", data: BREAKFAST_ITEMS },
+      { key: "grill", label: "Grill", icon: "chef-hat", data: GRILL_ITEMS },
+      { key: "salads", label: "Salads", icon: "salad", data: SALADS },
+      { key: "specialtySalads", label: "Specialty Salads", icon: "salad", data: SPECIALTY_SALADS },
+      { key: "catering", label: "Catering", icon: "party-popper", data: CATERING_CATEGORIES }
+    ];
+
+    /* ============================================================
+       HELPER: isStoreOpen
+       ============================================================ */
+    function isStoreOpen() {
+      var now = new Date();
+      var day = now.getDay();
+      var hours = STORE_HOURS[day];
+      var currentMin = now.getHours() * 60 + now.getMinutes();
+      return currentMin >= hours.openMin && currentMin < hours.closeMin;
+    }
+
+    /* ============================================================
+       REDUCER
+       ============================================================ */
+    var initialState = {
+      activeView: "home",
+      cart: [],
+      cartNote: "",
+      builder: {
+        step: 0,
+        bread: null,
+        meat: null,
+        cheese: null,
+        toppings: [],
+        condiments: [],
+        name: ""
+      },
+      menuCategory: "hotFoods",
+      orderConfirmation: null,
+      cateringForm: {
+        date: "",
+        guests: "",
+        categories: [],
+        dietary: "",
+        notes: "",
+        name: "",
+        phone: "",
+        email: ""
+      },
+      toastMessage: null
+    };
+
+    function reducer(state, action) {
+      switch (action.type) {
+        case "SET_VIEW":
+          return Object.assign({}, state, { activeView: action.payload });
+
+        case "ADD_TO_CART":
+          var newItem = {
+            cartId: Date.now(),
+            id: action.payload.id,
+            name: action.payload.name,
+            description: action.payload.description,
+            quantity: 1,
+            type: action.payload.type
+          };
+          return Object.assign({}, state, {
+            cart: state.cart.concat([newItem]),
+            toastMessage: "Added to order"
+          });
+
+        case "REMOVE_FROM_CART":
+          return Object.assign({}, state, {
+            cart: state.cart.filter(function(item) { return item.cartId !== action.payload; })
+          });
+
+        case "UPDATE_QUANTITY":
+          if (action.payload.quantity <= 0) {
+            return Object.assign({}, state, {
+              cart: state.cart.filter(function(item) { return item.cartId !== action.payload.cartId; })
+            });
+          }
+          return Object.assign({}, state, {
+            cart: state.cart.map(function(item) {
+              if (item.cartId === action.payload.cartId) {
+                return Object.assign({}, item, { quantity: action.payload.quantity });
+              }
+              return item;
+            })
+          });
+
+        case "SET_CART_NOTE":
+          return Object.assign({}, state, { cartNote: action.payload });
+
+        case "CLEAR_CART":
+          return Object.assign({}, state, { cart: [], cartNote: "" });
+
+        case "SET_BUILDER_STEP":
+          return Object.assign({}, state, {
+            builder: Object.assign({}, state.builder, { step: action.payload })
+          });
+
+        case "SET_BUILDER_SELECTION":
+          var field = action.payload.field;
+          var value = action.payload.value;
+          if (field === "toppings" || field === "condiments") {
+            var arr = state.builder[field];
+            var idx = arr.indexOf(value);
+            var newArr;
+            if (idx > -1) {
+              newArr = arr.filter(function(v) { return v !== value; });
+            } else {
+              newArr = arr.concat([value]);
+            }
+            var builderUpdate = {};
+            builderUpdate[field] = newArr;
+            return Object.assign({}, state, {
+              builder: Object.assign({}, state.builder, builderUpdate)
+            });
+          }
+          var singleUpdate = {};
+          singleUpdate[field] = value;
+          return Object.assign({}, state, {
+            builder: Object.assign({}, state.builder, singleUpdate)
+          });
+
+        case "RESET_BUILDER":
+          return Object.assign({}, state, {
+            builder: {
+              step: 0,
+              bread: null,
+              meat: null,
+              cheese: null,
+              toppings: [],
+              condiments: [],
+              name: ""
+            }
+          });
+
+        case "ADD_BYO_TO_CART":
+          var b = state.builder;
+          var parts = [b.bread, b.meat, b.cheese].filter(Boolean);
+          if (b.toppings.length > 0) parts = parts.concat(b.toppings);
+          if (b.condiments.length > 0) parts = parts.concat(b.condiments);
+          var byoItem = {
+            cartId: Date.now(),
+            id: "byo-" + Date.now(),
+            name: b.name || "Custom Sandwich",
+            description: parts.join(", "),
+            quantity: 1,
+            type: "byo"
+          };
+          return Object.assign({}, state, {
+            cart: state.cart.concat([byoItem]),
+            builder: {
+              step: 0,
+              bread: null,
+              meat: null,
+              cheese: null,
+              toppings: [],
+              condiments: [],
+              name: ""
+            },
+            toastMessage: "Added to order"
+          });
+
+        case "SET_MENU_CATEGORY":
+          return Object.assign({}, state, { menuCategory: action.payload });
+
+        case "PLACE_ORDER":
+          var orderNum = "LS-" + String(Math.floor(1000 + Math.random() * 9000));
+          return Object.assign({}, state, {
+            orderConfirmation: {
+              orderNumber: orderNum,
+              items: state.cart.slice(),
+              note: state.cartNote,
+              timestamp: new Date().toISOString()
+            },
+            cart: [],
+            cartNote: ""
+          });
+
+        case "CLEAR_CONFIRMATION":
+          return Object.assign({}, state, { orderConfirmation: null });
+
+        case "UPDATE_CATERING_FORM":
+          return Object.assign({}, state, {
+            cateringForm: Object.assign({}, state.cateringForm, action.payload)
+          });
+
+        case "RESET_CATERING_FORM":
+          return Object.assign({}, state, {
+            cateringForm: {
+              date: "",
+              guests: "",
+              categories: [],
+              dietary: "",
+              notes: "",
+              name: "",
+              phone: "",
+              email: ""
+            }
+          });
+
+        case "CLEAR_TOAST":
+          return Object.assign({}, state, { toastMessage: null });
+
+        default:
+          return state;
+      }
+    }
+
+    /* ============================================================
+       HEADER COMPONENT
+       ============================================================ */
+    function Header({ state, dispatch }) {
+      var cartCount = state.cart.reduce(function(sum, item) { return sum + item.quantity; }, 0);
+      return (
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 50,
+            height: '44px',
+            paddingTop: 'env(safe-area-inset-top)',
+            background: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderBottom: '0.5px solid rgba(60,60,67,0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingLeft: '16px',
+            paddingRight: '16px'
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              color: '#C23B22'
+            }}
+          >
+            Lange's
+          </span>
+          <div
+            onClick={function() { dispatch({ type: "SET_VIEW", payload: "cart" }); }}
+            style={{
+              position: 'relative',
+              cursor: 'pointer',
+              minWidth: '44px',
+              minHeight: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            className="active:opacity-70"
+          >
+            <Icon name="shopping-cart" size={24} color="#333" />
+            {cartCount > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '4px',
+                  right: '2px',
+                  background: '#C23B22',
+                  color: 'white',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  borderRadius: '9999px',
+                  minWidth: '18px',
+                  height: '18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 1,
+                  padding: '0 5px'
+                }}
+              >
+                {cartCount}
+              </span>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       TAB BAR COMPONENT
+       ============================================================ */
+    function TabBar({ state, dispatch }) {
+      var cartCount = state.cart.reduce(function(sum, item) { return sum + item.quantity; }, 0);
+      var tabs = [
+        { icon: "home", label: "Home", view: "home" },
+        { icon: "book-open", label: "Menu", view: "menu" },
+        { icon: "sandwich", label: "Build", view: "builder" },
+        { icon: "shopping-cart", label: "Order", view: "cart" },
+        { icon: "party-popper", label: "Catering", view: "catering" }
+      ];
+      return (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '100%',
+            maxWidth: '448px',
+            zIndex: 50,
+            height: '49px',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            background: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderTop: '0.5px solid rgba(60,60,67,0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-around'
+          }}
+        >
+          {tabs.map(function(tab) {
+            var isActive = state.activeView === tab.view;
+            var color = isActive ? '#C23B22' : '#999';
+            return (
+              <div
+                key={tab.view}
+                onClick={function() { dispatch({ type: "SET_VIEW", payload: tab.view }); }}
+                className="active:opacity-70"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  minWidth: '44px',
+                  minHeight: '44px',
+                  position: 'relative',
+                  flex: 1
+                }}
+              >
+                <div style={{ position: 'relative' }}>
+                  <Icon name={tab.icon} size={25} color={color} />
+                  {tab.view === "cart" && cartCount > 0 && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '-4px',
+                        right: '-8px',
+                        background: '#C23B22',
+                        color: 'white',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        borderRadius: '9999px',
+                        minWidth: '16px',
+                        height: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        lineHeight: 1,
+                        padding: '0 4px'
+                      }}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
+                <span style={{ fontSize: '10px', color: color, marginTop: '2px', fontWeight: isActive ? '600' : '400' }}>
+                  {tab.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    /* ============================================================
+       TOAST COMPONENT
+       ============================================================ */
+    function Toast({ message }) {
+      if (!message) return null;
+      return (
+        <div
+          style={{
+            position: 'fixed',
+            top: 'calc(44px + env(safe-area-inset-top) + 12px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 60,
+            background: '#C23B22',
+            color: 'white',
+            fontSize: '15px',
+            fontWeight: '500',
+            borderRadius: '9999px',
+            padding: '8px 16px',
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}
+        >
+          {message}
+        </div>
+      );
+    }
+
+    /* ============================================================
+       PLACEHOLDER VIEW COMPONENT
+       ============================================================ */
+    function PlaceholderView({ title }) {
+      return (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: 'calc(100vh - 44px - 49px - env(safe-area-inset-top) - env(safe-area-inset-bottom))',
+          padding: '20px'
+        }}>
+          <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#000', margin: '0 0 8px 0' }}>
+            {title}
+          </h1>
+          <p style={{ fontSize: '15px', color: '#8E8E93', margin: 0 }}>
+            Coming soon
+          </p>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       MAIN APP COMPONENT
+       ============================================================ */
+    function LangesApp() {
+      var ref = React.useReducer(reducer, initialState);
+      var state = ref[0];
+      var dispatch = ref[1];
+      var contentRef = React.useRef(null);
+
+      // Scroll to top on view change
+      React.useEffect(function() {
+        if (contentRef.current) {
+          contentRef.current.scrollTop = 0;
+        }
+      }, [state.activeView]);
+
+      // Clear toast after 1500ms
+      React.useEffect(function() {
+        if (state.toastMessage) {
+          var timer = setTimeout(function() {
+            dispatch({ type: "CLEAR_TOAST" });
+          }, 1500);
+          return function() { clearTimeout(timer); };
+        }
+      }, [state.toastMessage]);
+
+      // Determine which view to render
+      var viewContent;
+      switch (state.activeView) {
+        case "home":
+          viewContent = <PlaceholderView title="Home" />;
+          break;
+        case "menu":
+          viewContent = <PlaceholderView title="Menu" />;
+          break;
+        case "builder":
+          viewContent = <PlaceholderView title="Build Your Own" />;
+          break;
+        case "cart":
+          viewContent = <PlaceholderView title="Your Order" />;
+          break;
+        case "catering":
+          viewContent = <PlaceholderView title="Catering" />;
+          break;
+        default:
+          viewContent = <PlaceholderView title="Home" />;
+      }
+
+      return (
+        <div style={{ maxWidth: '448px', margin: '0 auto', position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+          <Header state={state} dispatch={dispatch} />
+          <main
+            ref={contentRef}
+            className="scroll-area"
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              paddingTop: '0',
+              paddingBottom: 'calc(49px + env(safe-area-inset-bottom))',
+              background: '#F2F2F7',
+              minHeight: 'calc(100vh - 44px - env(safe-area-inset-top))'
+            }}
+          >
+            {viewContent}
+          </main>
+          <TabBar state={state} dispatch={dispatch} />
+          <Toast message={state.toastMessage} />
+        </div>
+      );
+    }
+
+    /* ============================================================
+       RENDER
+       ============================================================ */
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      React.createElement(LangesApp)
+    );
+  </script>
+</body>
+</html>
