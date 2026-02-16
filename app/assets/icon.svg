@@ -1,0 +1,7 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Red background with rounded corners -->
+  <rect width="1024" height="1024" rx="220" fill="#C23B22"/>
+
+  <!-- White serif text "L's" centered -->
+  <text x="512" y="700" font-family="Georgia, serif" font-size="520" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">L's</text>
+</svg>
