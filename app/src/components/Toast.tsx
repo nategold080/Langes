@@ -1,24 +1,51 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Text, StyleSheet } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  runOnJS,
+} from 'react-native-reanimated';
 import { Colors } from '../constants/theme';
 import { useCartStore } from '../store/cartStore';
 
 export function Toast() {
   const toastMessage = useCartStore((s) => s.toastMessage);
   const clearToast = useCartStore((s) => s.clearToast);
+  const translateY = useSharedValue(-80);
   const opacity = useSharedValue(0);
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (toastMessage) {
-      opacity.value = withTiming(1, { duration: 200 });
-      opacity.value = withDelay(1500, withTiming(0, { duration: 300 }, () => {
-        runOnJS(clearToast)();
-      }));
+      // Clear any existing timer
+      if (dismissTimer.current) {
+        clearTimeout(dismissTimer.current);
+      }
+
+      // Slide in with spring
+      translateY.value = withSpring(0, { damping: 14, stiffness: 150 });
+      opacity.value = withTiming(1, { duration: 150 });
+
+      // Auto-dismiss after 2 seconds
+      dismissTimer.current = setTimeout(() => {
+        translateY.value = withTiming(-80, { duration: 250 });
+        opacity.value = withTiming(0, { duration: 250 }, () => {
+          runOnJS(clearToast)();
+        });
+      }, 2000);
     }
+
+    return () => {
+      if (dismissTimer.current) {
+        clearTimeout(dismissTimer.current);
+      }
+    };
   }, [toastMessage]);
 
   const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
     opacity: opacity.value,
   }));
 
@@ -42,10 +69,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     zIndex: 100,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 12,
   },
   text: {
     color: Colors.white,

@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,6 +24,23 @@ export default function CateringScreen() {
   const { form, submitted, updateForm, toggleCategory, resetForm, submitForm } =
     useCateringStore();
 
+  const buildInquiryText = () => {
+    const selectedCategories = CATERING_CATEGORIES
+      .filter((cat) => form.categories.includes(cat.id))
+      .map((cat) => cat.name)
+      .join(', ');
+
+    let text = `Catering Inquiry from ${form.name}\n`;
+    text += `Date: ${form.date || 'TBD'}\n`;
+    text += `Guests: ${form.guests || 'TBD'}\n`;
+    text += `Categories: ${selectedCategories}\n`;
+    if (form.dietary) text += `Dietary: ${form.dietary}\n`;
+    if (form.notes) text += `Notes: ${form.notes}\n`;
+    text += `Phone: ${form.phone}\n`;
+    text += `Email: ${form.email}`;
+    return text;
+  };
+
   const handleSubmit = () => {
     if (!form.name || !form.phone || !form.email) {
       Alert.alert('Missing Info', 'Please fill in your name, phone, and email.');
@@ -33,7 +51,48 @@ export default function CateringScreen() {
       return;
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    submitForm();
+
+    const inquiryText = buildInquiryText();
+
+    Alert.alert(
+      'Send Inquiry',
+      'How would you like to send your catering inquiry?',
+      [
+        {
+          text: 'Text',
+          onPress: () => {
+            const separator = Platform.OS === 'ios' ? '&' : '?';
+            const encoded = encodeURIComponent(inquiryText);
+            Linking.openURL(`sms:9143803532${separator}body=${encoded}`);
+            submitForm();
+          },
+        },
+        {
+          text: 'Email',
+          onPress: () => {
+            const subject = encodeURIComponent(`Catering Inquiry - ${form.name}`);
+            const body = encodeURIComponent(inquiryText);
+            Linking.openURL(`mailto:?subject=${subject}&body=${body}`);
+            submitForm();
+          },
+        },
+        {
+          text: 'Call',
+          onPress: () => {
+            Alert.alert(
+              'Your Inquiry',
+              `${inquiryText}\n\nReference this info on the call.`,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Call Now', onPress: () => Linking.openURL('tel:9142383553') },
+              ]
+            );
+            submitForm();
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
   };
 
   const handleDone = () => {
@@ -73,6 +132,8 @@ export default function CateringScreen() {
           onPress={() => router.back()}
           style={styles.headerLeft}
           activeOpacity={0.7}
+          accessibilityLabel="Close"
+          accessibilityRole="button"
         >
           <Ionicons name="close" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
@@ -131,6 +192,9 @@ export default function CateringScreen() {
                       toggleCategory(cat.id);
                     }}
                     activeOpacity={0.7}
+                    accessibilityLabel={cat.name + (selected ? ", selected" : "")}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{checked: selected}}
                   >
                     <View style={styles.categoryContent}>
                       <Text style={styles.categoryName}>{cat.name}</Text>
@@ -222,6 +286,8 @@ export default function CateringScreen() {
             style={styles.submitButton}
             onPress={handleSubmit}
             activeOpacity={0.8}
+            accessibilityLabel="Submit catering inquiry"
+            accessibilityRole="button"
           >
             <Text style={styles.submitText}>Submit Inquiry</Text>
           </TouchableOpacity>

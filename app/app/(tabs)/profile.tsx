@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Linking,
   Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,12 +15,46 @@ import { useRouter } from 'expo-router';
 import { Colors, Spacing } from '../../src/constants/theme';
 import { STORE_INFO, STORE_HOURS } from '../../src/constants/store';
 import { useStoreStatus } from '../../src/hooks/useStoreStatus';
+import { useOrderHistoryStore } from '../../src/store/orderHistoryStore';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { isOpen, statusText } = useStoreStatus();
+  const orders = useOrderHistoryStore((s) => s.orders);
+  const clearHistory = useOrderHistoryStore((s) => s.clearHistory);
+  const recentOrders = orders.slice(0, 5);
   const now = new Date();
   const day = now.getDay();
+
+  const formatRelativeTime = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const handleClearHistory = () => {
+    Alert.alert(
+      'Clear Order History',
+      'This will permanently delete all your order history.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear History',
+          style: 'destructive',
+          onPress: clearHistory,
+        },
+      ]
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -50,6 +85,7 @@ export default function ProfileScreen() {
             style={styles.row}
             onPress={() => Linking.openURL('tel:9142383553')}
             activeOpacity={0.7}
+            accessibilityRole="link"
           >
             <Ionicons name="call-outline" size={22} color={Colors.deliRed} />
             <View style={styles.rowContent}>
@@ -63,6 +99,7 @@ export default function ProfileScreen() {
             style={styles.row}
             onPress={() => Linking.openURL('sms:9143803532')}
             activeOpacity={0.7}
+            accessibilityRole="link"
           >
             <Ionicons name="chatbubble-outline" size={22} color={Colors.deliRed} />
             <View style={styles.rowContent}>
@@ -76,6 +113,7 @@ export default function ProfileScreen() {
             style={styles.row}
             onPress={() => Linking.openURL(`https://${STORE_INFO.website}`)}
             activeOpacity={0.7}
+            accessibilityRole="link"
           >
             <Ionicons name="globe-outline" size={22} color={Colors.deliRed} />
             <View style={styles.rowContent}>
@@ -89,6 +127,7 @@ export default function ProfileScreen() {
             style={styles.row}
             onPress={() => Linking.openURL('https://instagram.com/langes10514')}
             activeOpacity={0.7}
+            accessibilityRole="link"
           >
             <Ionicons name="logo-instagram" size={22} color={Colors.deliRed} />
             <View style={styles.rowContent}>
@@ -106,6 +145,7 @@ export default function ProfileScreen() {
             style={styles.row}
             onPress={() => Linking.openURL('maps:?address=382+King+Street+Chappaqua+NY+10514')}
             activeOpacity={0.7}
+            accessibilityRole="link"
           >
             <Ionicons name="location-outline" size={22} color={Colors.deliRed} />
             <View style={styles.rowContent}>
@@ -133,6 +173,47 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Order History */}
+        <Text style={styles.sectionLabel}>Order History</Text>
+        <View style={styles.card}>
+          {recentOrders.length === 0 ? (
+            <View style={styles.emptyHistory}>
+              <Text style={styles.emptyHistoryText}>No recent orders</Text>
+            </View>
+          ) : (
+            <>
+              {recentOrders.map((order, i) => (
+                <View key={order.id}>
+                  <View
+                    style={styles.orderHistoryRow}
+                    accessibilityLabel={order.orderNumber + ", " + order.itemCount + " items"}
+                  >
+                    <Ionicons name="receipt-outline" size={22} color={Colors.deliRed} />
+                    <View style={styles.rowContent}>
+                      <Text style={styles.orderNumber}>{order.orderNumber}</Text>
+                      <Text style={styles.rowSubtitle}>
+                        {order.itemCount} {order.itemCount === 1 ? 'item' : 'items'} · {formatRelativeTime(order.timestamp)}
+                      </Text>
+                    </View>
+                  </View>
+                  {i < recentOrders.length - 1 && <View style={styles.separator} />}
+                </View>
+              ))}
+              <View style={styles.separator} />
+              <TouchableOpacity
+                style={styles.clearHistoryRow}
+                onPress={handleClearHistory}
+                activeOpacity={0.7}
+                accessibilityLabel="Clear order history"
+                accessibilityRole="button"
+              >
+                <Ionicons name="trash-outline" size={18} color={Colors.destructive} />
+                <Text style={styles.clearHistoryText}>Clear History</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+
         {/* Account */}
         <Text style={styles.sectionLabel}>Account</Text>
         <View style={styles.card}>
@@ -140,6 +221,8 @@ export default function ProfileScreen() {
             style={styles.row}
             onPress={() => router.push('/(auth)/login')}
             activeOpacity={0.7}
+            accessibilityLabel="Sign in or create account"
+            accessibilityRole="button"
           >
             <Ionicons name="person-outline" size={22} color={Colors.deliRed} />
             <View style={styles.rowContent}>
@@ -153,6 +236,8 @@ export default function ProfileScreen() {
             style={styles.row}
             onPress={() => router.push('/privacy')}
             activeOpacity={0.7}
+            accessibilityLabel="View privacy policy"
+            accessibilityRole="link"
           >
             <Ionicons name="shield-checkmark-outline" size={22} color={Colors.deliRed} />
             <View style={styles.rowContent}>
@@ -292,6 +377,39 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     backgroundColor: Colors.separator,
     marginLeft: 50,
+  },
+  orderHistoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+  },
+  orderNumber: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.textPrimary,
+  },
+  emptyHistory: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  emptyHistoryText: {
+    fontSize: 15,
+    color: Colors.textSecondary,
+  },
+  clearHistoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    gap: 6,
+  },
+  clearHistoryText: {
+    fontSize: 15,
+    color: Colors.destructive,
+    fontWeight: '500',
   },
   hoursRow: {
     flexDirection: 'row',

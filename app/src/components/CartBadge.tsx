@@ -1,5 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { Colors } from '../constants/theme';
 
 interface CartBadgeProps {
@@ -7,11 +13,26 @@ interface CartBadgeProps {
 }
 
 export function CartBadge({ count }: CartBadgeProps) {
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    if (count > 0) {
+      scale.value = withSequence(
+        withTiming(1.3, { duration: 100 }),
+        withTiming(1, { duration: 100 }),
+      );
+    }
+  }, [count]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   if (count <= 0) return null;
   return (
-    <View style={styles.badge}>
+    <Animated.View style={[styles.badge, animatedStyle]}>
       <Text style={styles.text}>{count > 99 ? '99+' : count}</Text>
-    </View>
+    </Animated.View>
   );
 }
 

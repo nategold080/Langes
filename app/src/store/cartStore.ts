@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CartItem, OrderConfirmation } from '../types';
+import { useOrderHistoryStore } from './orderHistoryStore';
 
 interface CartStore {
   cart: CartItem[];
@@ -66,15 +67,27 @@ export const useCartStore = create<CartStore>()(
         const state = get();
         const orderNum =
           'LS-' + String(Math.floor(1000 + Math.random() * 9000));
+        const timestamp = new Date().toISOString();
+        const orderItems = [...state.cart];
+        const orderNote = state.cartNote;
+
         set({
           orderConfirmation: {
             orderNumber: orderNum,
-            items: [...state.cart],
-            note: state.cartNote,
-            timestamp: new Date().toISOString(),
+            items: orderItems,
+            note: orderNote,
+            timestamp,
           },
           cart: [],
           cartNote: '',
+        });
+
+        // Save to order history
+        useOrderHistoryStore.getState().addOrder({
+          orderNumber: orderNum,
+          items: orderItems,
+          note: orderNote,
+          timestamp,
         });
       },
 

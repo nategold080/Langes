@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -49,6 +50,8 @@ export default function HomeScreen() {
           onPress={() => router.push('/(tabs)/cart')}
           style={styles.headerButton}
           activeOpacity={0.7}
+          accessibilityLabel="Open cart"
+          accessibilityRole="button"
         >
           <Ionicons name="cart-outline" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
@@ -59,6 +62,7 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <Animated.View entering={FadeIn.duration(300)}>
         {/* Hero */}
         <View style={styles.hero}>
           <Text style={styles.heroTitle}>Lange's Little Store</Text>
@@ -75,6 +79,8 @@ export default function HomeScreen() {
             style={styles.quickAction}
             onPress={() => router.push('/(tabs)/menu')}
             activeOpacity={0.7}
+            accessibilityLabel="Browse menu"
+            accessibilityRole="button"
           >
             <Ionicons name="restaurant" size={22} color={Colors.deliRed} />
             <Text style={styles.quickActionLabel}>Order</Text>
@@ -84,6 +90,8 @@ export default function HomeScreen() {
             style={styles.quickAction}
             onPress={() => router.push('/(tabs)/builder')}
             activeOpacity={0.7}
+            accessibilityLabel="Build custom sandwich"
+            accessibilityRole="button"
           >
             <Ionicons name="fast-food" size={22} color={Colors.deliRed} />
             <Text style={styles.quickActionLabel}>Build</Text>
@@ -93,6 +101,8 @@ export default function HomeScreen() {
             style={styles.quickAction}
             onPress={handleCall}
             activeOpacity={0.7}
+            accessibilityLabel="Call store"
+            accessibilityRole="button"
           >
             <Ionicons name="call" size={22} color={Colors.deliRed} />
             <Text style={styles.quickActionLabel}>Call</Text>
@@ -136,6 +146,8 @@ export default function HomeScreen() {
                   onPress={() => handleAddHotFood(item)}
                   style={styles.addButton}
                   activeOpacity={0.7}
+                  accessibilityLabel={"Add " + item.name + " to order"}
+                  accessibilityRole="button"
                 >
                   <Ionicons name="add-circle" size={24} color={Colors.deliRed} />
                 </TouchableOpacity>
@@ -148,6 +160,8 @@ export default function HomeScreen() {
           onPress={() => router.push('/(tabs)/menu')}
           style={styles.seeFullMenu}
           activeOpacity={0.7}
+          accessibilityLabel="See full menu"
+          accessibilityRole="link"
         >
           <Text style={styles.seeFullMenuText}>See Full Menu →</Text>
         </TouchableOpacity>
@@ -199,7 +213,10 @@ export default function HomeScreen() {
               const isToday = i === day;
               return (
                 <View key={dayName}>
-                  <View style={styles.hoursRow}>
+                  <View
+                    style={styles.hoursRow}
+                    accessibilityLabel={dayName + ": " + h.open + " to " + h.close + (isToday ? ", today" : "")}
+                  >
                     <Text
                       style={[
                         styles.hoursDay,
@@ -225,6 +242,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.footer} />
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

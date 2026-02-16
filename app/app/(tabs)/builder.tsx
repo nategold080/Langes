@@ -91,7 +91,10 @@ export default function BuilderScreen() {
   };
 
   const renderStepIndicator = () => (
-    <View style={styles.stepIndicator}>
+    <View
+      style={styles.stepIndicator}
+      accessibilityLabel={"Step " + (step + 1) + " of " + STEPS.length + ", " + currentStep.title}
+    >
       {STEPS.map((_, i) => (
         <View
           key={i}
@@ -113,6 +116,8 @@ export default function BuilderScreen() {
         placeholderTextColor={Colors.textSecondary}
         value={builder.name}
         onChangeText={builder.setName}
+        accessibilityLabel="Sandwich name"
+        accessibilityHint="Optional name for your sandwich"
       />
       <View style={styles.reviewCard}>
         {builder.bread && (
@@ -162,6 +167,8 @@ export default function BuilderScreen() {
         style={styles.addToCartButton}
         onPress={handleAddToCart}
         activeOpacity={0.8}
+        accessibilityLabel="Add sandwich to order"
+        accessibilityRole="button"
       >
         <Text style={styles.addToCartText}>Add to Order</Text>
       </TouchableOpacity>
@@ -181,6 +188,8 @@ export default function BuilderScreen() {
                 style={styles.optionRow}
                 onPress={() => isMulti ? handleMultiSelect(option) : handleSingleSelect(option)}
                 activeOpacity={0.7}
+                accessibilityLabel={option + (selected ? ", selected" : "")}
+                accessibilityRole="button"
               >
                 <Text style={[styles.optionText, selected && styles.optionTextSelected]}>
                   {option}
@@ -231,6 +240,8 @@ export default function BuilderScreen() {
             style={[styles.navButton, step === 0 && styles.navButtonDisabled]}
             disabled={step === 0}
             activeOpacity={0.7}
+            accessibilityLabel="Go to previous step"
+            accessibilityRole="button"
           >
             <Ionicons name="arrow-back" size={20} color={step === 0 ? Colors.textSecondary : Colors.deliRed} />
             <Text style={[styles.navButtonText, step === 0 && styles.navButtonTextDisabled]}>
@@ -245,6 +256,8 @@ export default function BuilderScreen() {
             style={[styles.navButton, !canGoNext() && styles.navButtonDisabled]}
             disabled={!canGoNext()}
             activeOpacity={0.7}
+            accessibilityLabel="Go to next step"
+            accessibilityRole="button"
           >
             <Text style={[styles.navButtonText, !canGoNext() && styles.navButtonTextDisabled]}>
               Next

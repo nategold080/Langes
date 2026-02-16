@@ -9,6 +9,7 @@ import {
   Linking,
   Alert,
   Platform,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,6 +29,58 @@ export default function CartScreen() {
   const clearConfirmation = useCartStore((s) => s.clearConfirmation);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Build a plain text order summary for sharing/copying/referencing
+  const buildOrderSummary = () => {
+    if (!orderConfirmation) return '';
+    const lines = orderConfirmation.items.map(
+      (item) => `- ${item.quantity}x ${item.name}`
+    );
+    let text = `Order ${orderConfirmation.orderNumber}:\n${lines.join('\n')}`;
+    if (orderConfirmation.note) {
+      text += `\nNote: ${orderConfirmation.note}`;
+    }
+    return text;
+  };
+
+  const handleTextToOrder = () => {
+    if (!orderConfirmation) return;
+    const itemsList = orderConfirmation.items
+      .map((item) => `- ${item.quantity}x ${item.name}`)
+      .join('\n');
+    let body = `Hi! Order ${orderConfirmation.orderNumber}:\n${itemsList}`;
+    if (orderConfirmation.note) {
+      body += `\nNote: ${orderConfirmation.note}`;
+    }
+    const encoded = encodeURIComponent(body);
+    const separator = Platform.OS === 'ios' ? '&' : '?';
+    Linking.openURL(`sms:9143803532${separator}body=${encoded}`);
+  };
+
+  const handleCallToOrder = () => {
+    if (!orderConfirmation) return;
+    const summary = buildOrderSummary();
+    Alert.alert(
+      'Your Order Summary',
+      `${summary}\n\nReference this when you call.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Call Now',
+          onPress: () => Linking.openURL('tel:9142383553'),
+        },
+      ]
+    );
+  };
+
+  const handleShareOrder = async () => {
+    const summary = buildOrderSummary();
+    try {
+      await Share.share({ message: summary });
+    } catch (_) {
+      // User cancelled or share failed
+    }
+  };
 
   const handlePlaceOrder = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -94,21 +147,36 @@ export default function CartScreen() {
           <View style={styles.confirmActions}>
             <TouchableOpacity
               style={styles.confirmCallButton}
-              onPress={() => Linking.openURL('tel:9142383553')}
+              onPress={handleCallToOrder}
               activeOpacity={0.8}
+              accessibilityLabel="Call to place order"
+              accessibilityRole="button"
             >
               <Ionicons name="call" size={20} color={Colors.white} />
               <Text style={styles.confirmCallText}>Call to Order</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.confirmTextButton}
-              onPress={() => Linking.openURL('sms:9143803532')}
+              onPress={handleTextToOrder}
               activeOpacity={0.8}
+              accessibilityLabel="Text to place order"
+              accessibilityRole="button"
             >
               <Ionicons name="chatbubble" size={20} color={Colors.deliRed} />
               <Text style={styles.confirmTextText}>Text to Order</Text>
             </TouchableOpacity>
           </View>
+
+          <TouchableOpacity
+            style={styles.confirmCopyButton}
+            onPress={handleShareOrder}
+            activeOpacity={0.7}
+            accessibilityLabel="Copy or share your order"
+            accessibilityRole="button"
+          >
+            <Ionicons name="copy-outline" size={18} color={Colors.deliRed} />
+            <Text style={styles.confirmCopyText}>Copy / Share Order</Text>
+          </TouchableOpacity>
 
           <Text style={styles.confirmInfo}>
             Call or text us with your order number to confirm pickup time.
@@ -118,6 +186,8 @@ export default function CartScreen() {
             style={styles.newOrderButton}
             onPress={clearConfirmation}
             activeOpacity={0.7}
+            accessibilityLabel="Start a new order"
+            accessibilityRole="button"
           >
             <Text style={styles.newOrderText}>Start New Order</Text>
           </TouchableOpacity>
@@ -151,7 +221,7 @@ export default function CartScreen() {
         <Text style={styles.headerTitle}>
           Your Order ({totalItems} {totalItems === 1 ? 'item' : 'items'})
         </Text>
-        <TouchableOpacity onPress={handleClearCart} style={styles.clearButton} activeOpacity={0.7}>
+        <TouchableOpacity onPress={handleClearCart} style={styles.clearButton} activeOpacity={0.7} accessibilityLabel="Clear all items" accessibilityRole="button">
           <Text style={styles.clearText}>Clear</Text>
         </TouchableOpacity>
       </View>
@@ -182,6 +252,8 @@ export default function CartScreen() {
                     }}
                     style={styles.quantityButton}
                     activeOpacity={0.7}
+                    accessibilityLabel={item.quantity === 1 ? "Remove " + item.name : "Decrease " + item.name + " quantity"}
+                    accessibilityRole="button"
                   >
                     <Ionicons
                       name={item.quantity === 1 ? 'trash-outline' : 'remove-circle-outline'}
@@ -189,7 +261,7 @@ export default function CartScreen() {
                       color={item.quantity === 1 ? Colors.destructive : Colors.deliRed}
                     />
                   </TouchableOpacity>
-                  <Text style={styles.quantityText}>{item.quantity}</Text>
+                  <Text style={styles.quantityText} accessibilityLabel={item.quantity + " in order"}>{item.quantity}</Text>
                   <TouchableOpacity
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -197,6 +269,8 @@ export default function CartScreen() {
                     }}
                     style={styles.quantityButton}
                     activeOpacity={0.7}
+                    accessibilityLabel={"Increase " + item.name + " quantity"}
+                    accessibilityRole="button"
                   >
                     <Ionicons name="add-circle-outline" size={24} color={Colors.deliRed} />
                   </TouchableOpacity>
@@ -233,6 +307,8 @@ export default function CartScreen() {
           style={styles.placeOrderButton}
           onPress={handlePlaceOrder}
           activeOpacity={0.8}
+          accessibilityLabel="Place your order"
+          accessibilityRole="button"
         >
           <Text style={styles.placeOrderText}>Place Order</Text>
         </TouchableOpacity>
@@ -498,6 +574,19 @@ const styles = StyleSheet.create({
     color: Colors.deliRed,
     fontSize: 16,
     fontWeight: '600',
+  },
+  confirmCopyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 10,
+  },
+  confirmCopyText: {
+    color: Colors.deliRed,
+    fontSize: 15,
+    fontWeight: '500',
   },
   confirmInfo: {
     fontSize: 14,
