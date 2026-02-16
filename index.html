@@ -402,14 +402,20 @@
 
         case "ADD_BYO_TO_CART":
           var b = state.builder;
-          var parts = [b.bread, b.meat, b.cheese].filter(Boolean);
-          if (b.toppings.length > 0) parts = parts.concat(b.toppings);
-          if (b.condiments.length > 0) parts = parts.concat(b.condiments);
+          var descParts = [];
+          if (b.meat) descParts.push(b.meat);
+          if (b.cheese) descParts.push(b.cheese);
+          var mainPart = descParts.join(", ");
+          if (b.bread) mainPart = mainPart + " on " + b.bread;
+          var sections = [mainPart];
+          if (b.toppings.length > 0) sections.push(b.toppings.join(", "));
+          if (b.condiments.length > 0) sections.push(b.condiments.join(", "));
+          var description = sections.join(" \u00B7 ");
           var byoItem = {
             cartId: Date.now(),
             id: "byo-" + Date.now(),
             name: b.name || "Custom Sandwich",
-            description: parts.join(", "),
+            description: description,
             quantity: 1,
             type: "byo"
           };
@@ -478,6 +484,19 @@
        ============================================================ */
     function Header({ state, dispatch }) {
       var cartCount = state.cart.reduce(function(sum, item) { return sum + item.quantity; }, 0);
+      var badgeBounceState = React.useState(false);
+      var badgeBounce = badgeBounceState[0];
+      var setBadgeBounce = badgeBounceState[1];
+      var prevCountRef = React.useRef(cartCount);
+      React.useEffect(function() {
+        if (cartCount > 0 && cartCount !== prevCountRef.current) {
+          setBadgeBounce(true);
+          var timer = setTimeout(function() { setBadgeBounce(false); }, 200);
+          prevCountRef.current = cartCount;
+          return function() { clearTimeout(timer); };
+        }
+        prevCountRef.current = cartCount;
+      }, [cartCount]);
       return (
         <div
           style={{
@@ -538,7 +557,9 @@
                   alignItems: 'center',
                   justifyContent: 'center',
                   lineHeight: 1,
-                  padding: '0 5px'
+                  padding: '0 5px',
+                  transform: badgeBounce ? 'scale(1.3)' : 'scale(1)',
+                  transition: badgeBounce ? 'transform 0.15s ease-out' : 'transform 0.15s ease-in'
                 }}
               >
                 {cartCount}
@@ -858,6 +879,7 @@
               display: 'flex',
               overflowX: 'auto',
               scrollSnapType: 'x mandatory',
+              scrollBehavior: 'smooth',
               paddingLeft: '16px',
               paddingRight: '16px',
               gap: '10px'
@@ -1094,7 +1116,16 @@
        MENU VIEW COMPONENT
        ============================================================ */
     function MenuView({ state, dispatch }) {
-      var activeCat = MENU_CATEGORIES.find(function(c) { return c.key === state.menuCategory; });
+      var tabContainerRef = React.useRef(null);
+
+      React.useEffect(function() {
+        if (tabContainerRef.current) {
+          var el = tabContainerRef.current.querySelector('[data-cat="' + state.menuCategory + '"]');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
+        }
+      }, [state.menuCategory]);
 
       function renderCategoryContent() {
         switch (state.menuCategory) {
@@ -1558,6 +1589,7 @@
             borderBottom: '0.5px solid rgba(60,60,67,0.12)'
           }}>
             <div
+              ref={tabContainerRef}
               className="no-scrollbar"
               style={{
                 display: 'flex',
@@ -1573,6 +1605,7 @@
                 return (
                   <div
                     key={cat.key}
+                    data-cat={cat.key}
                     onClick={function() {
                       dispatch({ type: "SET_MENU_CATEGORY", payload: cat.key });
                     }}
@@ -1664,6 +1697,22 @@
         );
       }
 
+      var fadeRef = React.useRef(null);
+      React.useEffect(function() {
+        if (fadeRef.current) {
+          fadeRef.current.style.opacity = '0';
+          fadeRef.current.style.transition = 'none';
+          requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+              if (fadeRef.current) {
+                fadeRef.current.style.transition = 'opacity 0.2s ease-in';
+                fadeRef.current.style.opacity = '1';
+              }
+            });
+          });
+        }
+      }, [step]);
+
       var hasSummary = state.builder.bread || state.builder.meat || state.builder.cheese || state.builder.toppings.length > 0 || state.builder.condiments.length > 0;
 
       function isNextDisabled() {
@@ -1694,6 +1743,7 @@
             Step {step + 1} of 6 {"\u00B7"} {stepNames[step]}
           </div>
 
+          <div ref={fadeRef}>
           {/* Running Summary (Steps 0-4 only) */}
           {step < 5 && hasSummary && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingLeft: '16px', paddingRight: '16px', paddingTop: '8px', paddingBottom: '8px' }}>
@@ -1988,6 +2038,7 @@
               </div>
             </div>
           )}
+          </div>
         </div>
       );
     }
@@ -2066,7 +2117,15 @@
               <div style={{ fontSize: '22px', fontWeight: '700', color: '#000', marginTop: '16px' }}>
                 Order Received!
               </div>
-              <div style={{ fontSize: '17px', color: 'rgba(60,60,67,0.6)', marginTop: '4px' }}>
+              <div
+                onClick={function() {
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(conf.orderNumber);
+                  }
+                }}
+                className="active:opacity-70"
+                style={{ fontSize: '17px', color: 'rgba(60,60,67,0.6)', marginTop: '4px', cursor: 'pointer' }}
+              >
                 Order #{conf.orderNumber}
               </div>
             </div>
@@ -2285,6 +2344,7 @@
             <textarea
               value={state.cartNote}
               onChange={function(e) { dispatch({ type: "SET_CART_NOTE", payload: e.target.value }); }}
+              onInput={function(e) { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
               placeholder="Allergies, modifications, pickup time..."
               style={{
                 width: '100%',
@@ -2297,7 +2357,8 @@
                 boxSizing: 'border-box',
                 resize: 'none',
                 minHeight: '80px',
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
+                overflow: 'hidden'
               }}
             />
           </div>
@@ -2584,6 +2645,7 @@
             <textarea
               value={cf.notes}
               onChange={function(e) { dispatch({ type: "UPDATE_CATERING_FORM", payload: { notes: e.target.value } }); }}
+              onInput={function(e) { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
               placeholder="Tell us about your event..."
               style={{
                 width: '100%',
@@ -2596,7 +2658,8 @@
                 boxSizing: 'border-box',
                 resize: 'none',
                 minHeight: '80px',
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
+                overflow: 'hidden'
               }}
             />
           </div>
