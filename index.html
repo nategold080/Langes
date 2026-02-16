@@ -690,6 +690,1708 @@
     }
 
     /* ============================================================
+       HOME VIEW COMPONENT
+       ============================================================ */
+    function HomeView({ state, dispatch }) {
+      var open = isStoreOpen();
+      var now = new Date();
+      var day = now.getDay();
+      var hours = STORE_HOURS[day];
+      var statusText = open
+        ? "Open \u00B7 Closes " + hours.close
+        : "Closed \u00B7 Opens " + hours.open;
+
+      var knownForItems = [
+        { name: "The King Street", category: "Signature" },
+        { name: "Chipotle Chicken Wrap", category: "Signature" },
+        { name: "Roast Beef Sandwich", category: "Deli Classic" },
+        { name: "South Greeley Wrap", category: "Signature" },
+        { name: "German Potato Salad", category: "Side" },
+        { name: "Bratwurst & Kraut", category: "Hot Food" },
+        { name: "Macaroni Salad", category: "Side" },
+        { name: "Broasted Chicken", category: "Hot Food" }
+      ];
+
+      var hotFoodPreview = HOT_FOODS.slice(0, 6);
+
+      return (
+        <div style={{ paddingBottom: '100px' }}>
+          {/* Hero */}
+          <div style={{
+            background: '#C23B22',
+            width: '100%',
+            paddingLeft: '32px',
+            paddingRight: '32px',
+            paddingTop: '40px',
+            paddingBottom: '40px',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: '28px',
+              fontWeight: 'bold',
+              color: '#FFFFFF'
+            }}>
+              Lange's Little Store
+            </div>
+            <div style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: '20px',
+              fontStyle: 'italic',
+              color: '#FFFFFF',
+              marginTop: '2px'
+            }}>
+              & Delicatessen
+            </div>
+            <div style={{
+              fontSize: '14px',
+              color: 'rgba(255,255,255,0.7)',
+              marginTop: '6px'
+            }}>
+              Since 1965 &middot; Chappaqua, NY
+            </div>
+            <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center' }}>
+              <span style={{
+                display: 'inline-block',
+                fontSize: '13px',
+                color: '#FFFFFF',
+                background: open ? '#34C759' : '#8E8E93',
+                paddingLeft: '12px',
+                paddingRight: '12px',
+                paddingTop: '4px',
+                paddingBottom: '4px',
+                borderRadius: '9999px'
+              }}>
+                {statusText}
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '10px',
+            marginLeft: '16px',
+            marginRight: '16px',
+            marginTop: '-20px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            alignItems: 'stretch'
+          }}>
+            <div
+              onClick={function() { dispatch({ type: "SET_VIEW", payload: "menu" }); }}
+              className="active:opacity-70"
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '44px',
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              <Icon name="utensils" size={22} color="#C23B22" />
+              <span style={{ fontSize: '13px', color: '#C23B22', marginTop: '4px' }}>Order</span>
+            </div>
+            <div style={{ width: '0.5px', background: 'rgba(60,60,67,0.12)', alignSelf: 'stretch' }} />
+            <div
+              onClick={function() { dispatch({ type: "SET_VIEW", payload: "builder" }); }}
+              className="active:opacity-70"
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '44px',
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              <Icon name="sandwich" size={22} color="#C23B22" />
+              <span style={{ fontSize: '13px', color: '#C23B22', marginTop: '4px' }}>Build</span>
+            </div>
+            <div style={{ width: '0.5px', background: 'rgba(60,60,67,0.12)', alignSelf: 'stretch' }} />
+            <a
+              href="tel:9142383553"
+              className="active:opacity-70"
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '44px',
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                cursor: 'pointer',
+                textDecoration: 'none'
+              }}
+            >
+              <Icon name="phone" size={22} color="#C23B22" />
+              <span style={{ fontSize: '13px', color: '#C23B22', marginTop: '4px' }}>Call</span>
+            </a>
+          </div>
+
+          {/* WHAT WE'RE KNOWN FOR */}
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            color: 'rgba(60,60,67,0.6)',
+            paddingLeft: '16px',
+            paddingBottom: '8px',
+            paddingTop: '32px',
+            letterSpacing: '0.5px'
+          }}>
+            What We're Known For
+          </div>
+          <div
+            className="no-scrollbar"
+            style={{
+              display: 'flex',
+              overflowX: 'auto',
+              scrollSnapType: 'x mandatory',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+              gap: '10px'
+            }}
+          >
+            {knownForItems.map(function(item, i) {
+              return (
+                <div
+                  key={i}
+                  onClick={function() { dispatch({ type: "SET_VIEW", payload: "menu" }); }}
+                  className="active:opacity-70"
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: '10px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                    width: '130px',
+                    minWidth: '130px',
+                    padding: '12px',
+                    flexShrink: 0,
+                    scrollSnapAlign: 'start',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
+                  <span style={{ fontSize: '16px' }}>{"\u2B50"}</span>
+                  <span style={{
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    marginTop: '6px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    lineHeight: '1.3'
+                  }}>
+                    {item.name}
+                  </span>
+                  <span style={{
+                    fontSize: '12px',
+                    color: '#8E8E93',
+                    marginTop: '4px'
+                  }}>
+                    {item.category}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* TODAY'S HOT FOODS */}
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            color: 'rgba(60,60,67,0.6)',
+            paddingLeft: '16px',
+            paddingBottom: '8px',
+            paddingTop: '32px',
+            letterSpacing: '0.5px'
+          }}>
+            {"\uD83D\uDD25"} Today's Hot Foods
+          </div>
+          <div style={{
+            fontSize: '13px',
+            color: '#8E8E93',
+            paddingLeft: '16px',
+            paddingBottom: '10px'
+          }}>
+            Selections change daily — here's what we offer
+          </div>
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '10px',
+            marginLeft: '16px',
+            marginRight: '16px',
+            overflow: 'hidden'
+          }}>
+            {hotFoodPreview.map(function(item, i) {
+              return (
+                <div key={item.id}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      minHeight: '44px',
+                      paddingLeft: '16px',
+                      paddingRight: '16px'
+                    }}
+                  >
+                    <span style={{ fontSize: '17px', color: '#000' }}>{item.name}</span>
+                    <div
+                      onClick={function() {
+                        dispatch({
+                          type: "ADD_TO_CART",
+                          payload: { id: item.id, name: item.name, type: "hotFood" }
+                        });
+                      }}
+                      className="active:opacity-70"
+                      style={{
+                        cursor: 'pointer',
+                        minWidth: '44px',
+                        minHeight: '44px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Icon name="plus-circle" size={22} color="#C23B22" />
+                    </div>
+                  </div>
+                  {i < hotFoodPreview.length - 1 && (
+                    <div style={{
+                      height: '0.5px',
+                      background: 'rgba(60,60,67,0.12)',
+                      marginLeft: '16px'
+                    }} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div
+            onClick={function() { dispatch({ type: "SET_VIEW", payload: "menu" }); }}
+            className="active:opacity-70"
+            style={{
+              textAlign: 'center',
+              color: '#C23B22',
+              fontSize: '15px',
+              paddingTop: '14px',
+              paddingBottom: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            See Full Menu →
+          </div>
+
+          {/* VISIT US */}
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            color: 'rgba(60,60,67,0.6)',
+            paddingLeft: '16px',
+            paddingBottom: '8px',
+            paddingTop: '32px',
+            letterSpacing: '0.5px'
+          }}>
+            Visit Us
+          </div>
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '10px',
+            marginLeft: '16px',
+            marginRight: '16px',
+            overflow: 'hidden'
+          }}>
+            {/* Address row */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              minHeight: '44px',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+              gap: '12px'
+            }}>
+              <Icon name="map-pin" size={20} color="#8E8E93" />
+              <span style={{ fontSize: '17px', color: '#000' }}>382 King Street, Chappaqua, NY 10514</span>
+            </div>
+            <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+            {/* Phone row */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              minHeight: '44px',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+              gap: '12px'
+            }}>
+              <Icon name="phone" size={20} color="#8E8E93" />
+              <a href="tel:9142383553" style={{ fontSize: '17px', color: '#C23B22', textDecoration: 'none' }}>(914) 238-3553</a>
+            </div>
+            <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+            {/* Text row */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              minHeight: '44px',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+              gap: '12px'
+            }}>
+              <Icon name="message-square" size={20} color="#8E8E93" />
+              <span style={{ fontSize: '17px', color: '#000' }}>Text your order: (914) 380-3532</span>
+            </div>
+            <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+            {/* Hours row */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              minHeight: '44px',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+              paddingTop: '12px',
+              paddingBottom: '12px',
+              gap: '12px'
+            }}>
+              <div style={{ paddingTop: '2px' }}>
+                <Icon name="clock" size={20} color="#8E8E93" />
+              </div>
+              <div>
+                <div style={{ fontSize: '17px', color: '#000' }}>Mon–Sat: 6AM – 6PM</div>
+                <div style={{ fontSize: '17px', color: '#000', marginTop: '2px' }}>Sunday: 6AM – 3PM</div>
+              </div>
+            </div>
+          </div>
+          {/* Allergy footnote */}
+          <div style={{
+            fontSize: '13px',
+            color: '#AEAEB2',
+            fontStyle: 'italic',
+            paddingLeft: '16px',
+            paddingRight: '16px',
+            paddingTop: '12px'
+          }}>
+            Please inform us of any allergies. Not all ingredients are listed.
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       MENU VIEW COMPONENT
+       ============================================================ */
+    function MenuView({ state, dispatch }) {
+      var activeCat = MENU_CATEGORIES.find(function(c) { return c.key === state.menuCategory; });
+
+      function renderCategoryContent() {
+        switch (state.menuCategory) {
+          case "hotFoods":
+            return (
+              <div>
+                <div style={{
+                  background: '#FDF6EC',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  padding: '12px',
+                  marginTop: '12px'
+                }}>
+                  <span style={{ fontSize: '15px', fontStyle: 'italic', color: 'rgba(60,60,67,0.6)' }}>
+                    {"\uD83D\uDD25"} Hot foods change daily — ask us what's fresh today!
+                  </span>
+                </div>
+                <div style={{
+                  background: '#FFFFFF',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  marginTop: '12px',
+                  overflow: 'hidden'
+                }}>
+                  {HOT_FOODS.map(function(item, i) {
+                    return (
+                      <div key={item.id}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          minHeight: '44px',
+                          paddingLeft: '16px',
+                          paddingRight: '0'
+                        }}>
+                          <span style={{ fontSize: '17px', color: '#000' }}>{item.name}</span>
+                          <div
+                            onClick={function() {
+                              dispatch({ type: "ADD_TO_CART", payload: { id: item.id, name: item.name, type: "hotFood" } });
+                            }}
+                            className="active:opacity-70"
+                            style={{
+                              cursor: 'pointer',
+                              minWidth: '44px',
+                              minHeight: '44px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Icon name="plus-circle" size={22} color="#C23B22" />
+                          </div>
+                        </div>
+                        {i < HOT_FOODS.length - 1 && (
+                          <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+
+          case "hotSandwiches":
+            return (
+              <div>
+                <div style={{
+                  background: '#FDF6EC',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  padding: '12px',
+                  marginTop: '12px'
+                }}>
+                  <span style={{ fontSize: '15px', fontStyle: 'italic', color: 'rgba(60,60,67,0.6)' }}>
+                    All wedges extra
+                  </span>
+                </div>
+                <div style={{
+                  background: '#FFFFFF',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  marginTop: '12px',
+                  overflow: 'hidden'
+                }}>
+                  {HOT_SANDWICHES.map(function(item, i) {
+                    return (
+                      <div key={item.id}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          minHeight: '60px',
+                          paddingTop: '10px',
+                          paddingBottom: '10px',
+                          paddingLeft: '16px',
+                          paddingRight: '0'
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '17px', fontWeight: '600', color: '#000' }}>{item.name}</div>
+                            <div style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)', marginTop: '2px' }}>{item.description}</div>
+                          </div>
+                          <div
+                            onClick={function() {
+                              dispatch({ type: "ADD_TO_CART", payload: { id: item.id, name: item.name, description: item.description, type: "hotSandwich" } });
+                            }}
+                            className="active:opacity-70"
+                            style={{
+                              cursor: 'pointer',
+                              minWidth: '44px',
+                              minHeight: '44px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Icon name="plus-circle" size={22} color="#C23B22" />
+                          </div>
+                        </div>
+                        {i < HOT_SANDWICHES.length - 1 && (
+                          <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+
+          case "signatures":
+            return (
+              <div>
+                <div style={{
+                  background: '#FDF6EC',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  padding: '12px',
+                  marginTop: '12px'
+                }}>
+                  <span style={{ fontSize: '15px', fontStyle: 'italic', color: 'rgba(60,60,67,0.6)' }}>
+                    All wedges extra
+                  </span>
+                </div>
+                <div style={{
+                  background: '#FFFFFF',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  marginTop: '12px',
+                  overflow: 'hidden'
+                }}>
+                  {SIGNATURE_SANDWICHES.map(function(item, i) {
+                    return (
+                      <div key={item.id}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          minHeight: '60px',
+                          paddingTop: '10px',
+                          paddingBottom: '10px',
+                          paddingLeft: '16px',
+                          paddingRight: '0'
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            {item.popular && (
+                              <div style={{ fontSize: '12px', fontWeight: '700', color: '#D4A843', marginBottom: '2px' }}>Popular</div>
+                            )}
+                            <div style={{ fontSize: '17px', fontWeight: '600', color: '#000' }}>{item.name}</div>
+                            <div style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)', marginTop: '2px' }}>{item.description}</div>
+                          </div>
+                          <div
+                            onClick={function() {
+                              dispatch({ type: "ADD_TO_CART", payload: { id: item.id, name: item.name, description: item.description, type: "signature" } });
+                            }}
+                            className="active:opacity-70"
+                            style={{
+                              cursor: 'pointer',
+                              minWidth: '44px',
+                              minHeight: '44px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Icon name="plus-circle" size={22} color="#C23B22" />
+                          </div>
+                        </div>
+                        {i < SIGNATURE_SANDWICHES.length - 1 && (
+                          <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+
+          case "breakfast":
+            return (
+              <div>
+                <div style={{
+                  background: '#FFFFFF',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  marginTop: '12px',
+                  overflow: 'hidden'
+                }}>
+                  {BREAKFAST_ITEMS.map(function(item, i) {
+                    return (
+                      <div key={item.id}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          minHeight: item.description ? '60px' : '44px',
+                          paddingTop: item.description ? '10px' : '0',
+                          paddingBottom: item.description ? '10px' : '0',
+                          paddingLeft: '16px',
+                          paddingRight: '0'
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '17px', fontWeight: '600', color: '#000' }}>{item.name}</div>
+                            {item.description && (
+                              <div style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)', marginTop: '2px' }}>{item.description}</div>
+                            )}
+                          </div>
+                          <div
+                            onClick={function() {
+                              dispatch({ type: "ADD_TO_CART", payload: { id: item.id, name: item.name, description: item.description, type: "breakfast" } });
+                            }}
+                            className="active:opacity-70"
+                            style={{
+                              cursor: 'pointer',
+                              minWidth: '44px',
+                              minHeight: '44px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Icon name="plus-circle" size={22} color="#C23B22" />
+                          </div>
+                        </div>
+                        {i < BREAKFAST_ITEMS.length - 1 && (
+                          <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+
+          case "grill":
+            return (
+              <div>
+                <div style={{
+                  background: '#FFFFFF',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  marginTop: '12px',
+                  overflow: 'hidden'
+                }}>
+                  {GRILL_ITEMS.map(function(item, i) {
+                    return (
+                      <div key={item.id}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          minHeight: item.description ? '60px' : '44px',
+                          paddingTop: item.description ? '10px' : '0',
+                          paddingBottom: item.description ? '10px' : '0',
+                          paddingLeft: '16px',
+                          paddingRight: '0'
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '17px', fontWeight: '600', color: '#000' }}>{item.name}</div>
+                            {item.description && (
+                              <div style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)', marginTop: '2px' }}>{item.description}</div>
+                            )}
+                          </div>
+                          <div
+                            onClick={function() {
+                              dispatch({ type: "ADD_TO_CART", payload: { id: item.id, name: item.name, description: item.description, type: "grill" } });
+                            }}
+                            className="active:opacity-70"
+                            style={{
+                              cursor: 'pointer',
+                              minWidth: '44px',
+                              minHeight: '44px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Icon name="plus-circle" size={22} color="#C23B22" />
+                          </div>
+                        </div>
+                        {i < GRILL_ITEMS.length - 1 && (
+                          <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+
+          case "salads":
+            return (
+              <div>
+                <div style={{
+                  background: '#FFFFFF',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  marginTop: '12px',
+                  overflow: 'hidden'
+                }}>
+                  {SALADS.map(function(item, i) {
+                    return (
+                      <div key={item.id}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          minHeight: '44px',
+                          paddingLeft: '16px',
+                          paddingRight: '0'
+                        }}>
+                          <span style={{ fontSize: '17px', color: '#000' }}>{item.name}</span>
+                          <div
+                            onClick={function() {
+                              dispatch({ type: "ADD_TO_CART", payload: { id: item.id, name: item.name, type: "salad" } });
+                            }}
+                            className="active:opacity-70"
+                            style={{
+                              cursor: 'pointer',
+                              minWidth: '44px',
+                              minHeight: '44px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Icon name="plus-circle" size={22} color="#C23B22" />
+                          </div>
+                        </div>
+                        {i < SALADS.length - 1 && (
+                          <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+
+          case "specialtySalads":
+            return (
+              <div>
+                <div style={{
+                  background: '#FFFFFF',
+                  borderRadius: '10px',
+                  marginLeft: '16px',
+                  marginRight: '16px',
+                  marginTop: '12px',
+                  overflow: 'hidden'
+                }}>
+                  {SPECIALTY_SALADS.map(function(item, i) {
+                    return (
+                      <div key={item.id}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          minHeight: '44px',
+                          paddingLeft: '16px',
+                          paddingRight: '0'
+                        }}>
+                          <span style={{ fontSize: '17px', color: '#000' }}>{item.name}</span>
+                          <div
+                            onClick={function() {
+                              dispatch({ type: "ADD_TO_CART", payload: { id: item.id, name: item.name, type: "specialtySalad" } });
+                            }}
+                            className="active:opacity-70"
+                            style={{
+                              cursor: 'pointer',
+                              minWidth: '44px',
+                              minHeight: '44px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            <Icon name="plus-circle" size={22} color="#C23B22" />
+                          </div>
+                        </div>
+                        {i < SPECIALTY_SALADS.length - 1 && (
+                          <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+
+          case "catering":
+            return (
+              <div>
+                {CATERING_CATEGORIES.map(function(item) {
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={function() { dispatch({ type: "SET_VIEW", payload: "catering" }); }}
+                      className="active:opacity-70"
+                      style={{
+                        background: '#FFFFFF',
+                        borderRadius: '10px',
+                        marginLeft: '16px',
+                        marginRight: '16px',
+                        marginTop: '10px',
+                        paddingLeft: '16px',
+                        paddingRight: '16px',
+                        paddingTop: '14px',
+                        paddingBottom: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '17px', fontWeight: '600', color: '#000' }}>{item.name}</div>
+                        <div style={{ fontSize: '13px', color: 'rgba(60,60,67,0.6)', marginTop: '2px' }}>{item.description}</div>
+                      </div>
+                      <Icon name="chevron-right" size={20} color="#8E8E93" />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+
+          default:
+            return null;
+        }
+      }
+
+      return (
+        <div style={{ paddingBottom: '100px' }}>
+          {/* Category Tabs */}
+          <div style={{
+            position: 'sticky',
+            top: '0',
+            zIndex: 40,
+            background: '#FFFFFF',
+            borderBottom: '0.5px solid rgba(60,60,67,0.12)'
+          }}>
+            <div
+              className="no-scrollbar"
+              style={{
+                display: 'flex',
+                overflowX: 'auto',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {MENU_CATEGORIES.map(function(cat) {
+                var isActive = state.menuCategory === cat.key;
+                var label = cat.label;
+                if (cat.key === "hotFoods") label = "\uD83D\uDD25 " + label;
+                if (cat.key === "signatures") label = "\u2B50 " + label;
+                return (
+                  <div
+                    key={cat.key}
+                    onClick={function() {
+                      dispatch({ type: "SET_MENU_CATEGORY", payload: cat.key });
+                    }}
+                    className="active:opacity-70"
+                    style={{
+                      display: 'inline-block',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      paddingLeft: '14px',
+                      paddingRight: '14px',
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      color: isActive ? '#C23B22' : 'rgba(60,60,67,0.6)',
+                      borderBottom: isActive ? '2px solid #C23B22' : '2px solid transparent'
+                    }}
+                  >
+                    {label}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Category Content */}
+          {renderCategoryContent()}
+
+          {/* Allergy Footer */}
+          <div style={{
+            fontSize: '13px',
+            color: 'rgba(60,60,67,0.3)',
+            fontStyle: 'italic',
+            textAlign: 'center',
+            paddingLeft: '16px',
+            paddingRight: '16px',
+            paddingTop: '20px'
+          }}>
+            Please inform us of any allergies. Not all ingredients are listed.
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       BUILDER VIEW COMPONENT
+       ============================================================ */
+    function BuilderView({ state, dispatch }) {
+      var step = state.builder.step;
+      var stepNames = ["Bread", "Meat", "Cheese", "Toppings", "Condiments", "Review"];
+      var stepKeys = ["bread", "meat", "cheese", "toppings", "condiments"];
+      var optionArrays = [BYO_OPTIONS.bread, BYO_OPTIONS.meat, BYO_OPTIONS.cheese, BYO_OPTIONS.toppings, BYO_OPTIONS.condiments];
+
+      var isSingleSelect = step <= 2;
+      var isMultiSelect = step === 3 || step === 4;
+
+      function renderDot(i) {
+        if (i < step) {
+          return (
+            <div style={{
+              width: '8px', height: '8px', borderRadius: '9999px',
+              background: '#2D5016',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+              <span style={{ fontSize: '6px', color: 'white', lineHeight: 1 }}>{"\u2713"}</span>
+            </div>
+          );
+        }
+        if (i === step) {
+          return (
+            <div style={{
+              width: '10px', height: '10px', borderRadius: '9999px',
+              background: '#C23B22'
+            }} />
+          );
+        }
+        return (
+          <div style={{
+            width: '8px', height: '8px', borderRadius: '9999px',
+            background: 'rgba(120,120,128,0.2)'
+          }} />
+        );
+      }
+
+      function renderLine(i) {
+        var color = i < step ? '#2D5016' : 'rgba(120,120,128,0.2)';
+        return (
+          <div style={{ width: '20px', height: '2px', background: color }} />
+        );
+      }
+
+      var hasSummary = state.builder.bread || state.builder.meat || state.builder.cheese || state.builder.toppings.length > 0 || state.builder.condiments.length > 0;
+
+      function isNextDisabled() {
+        if (step >= 3) return false;
+        var key = stepKeys[step];
+        return !state.builder[key];
+      }
+
+      return (
+        <div style={{ paddingBottom: '100px' }}>
+          {/* Title */}
+          <div style={{ fontSize: '22px', fontWeight: '700', textAlign: 'center', paddingTop: '16px', color: '#000' }}>
+            Build Your Sandwich
+          </div>
+
+          {/* Step Indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '16px', paddingBottom: '8px', paddingLeft: '32px', paddingRight: '32px' }}>
+            {[0,1,2,3,4,5].map(function(i) {
+              return (
+                <React.Fragment key={i}>
+                  {renderDot(i)}
+                  {i < 5 && renderLine(i)}
+                </React.Fragment>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: '13px', color: 'rgba(60,60,67,0.6)', textAlign: 'center', marginTop: '8px' }}>
+            Step {step + 1} of 6 {"\u00B7"} {stepNames[step]}
+          </div>
+
+          {/* Running Summary (Steps 0-4 only) */}
+          {step < 5 && hasSummary && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingLeft: '16px', paddingRight: '16px', paddingTop: '8px', paddingBottom: '8px' }}>
+              {state.builder.bread && (
+                <span style={{ background: '#F2F2F7', fontSize: '12px', borderRadius: '9999px', paddingLeft: '10px', paddingRight: '10px', paddingTop: '4px', paddingBottom: '4px', color: '#000' }}>
+                  {"\uD83C\uDF5E"} {state.builder.bread}
+                </span>
+              )}
+              {state.builder.meat && (
+                <span style={{ background: '#F2F2F7', fontSize: '12px', borderRadius: '9999px', paddingLeft: '10px', paddingRight: '10px', paddingTop: '4px', paddingBottom: '4px', color: '#000' }}>
+                  {"\uD83E\uDD69"} {state.builder.meat}
+                </span>
+              )}
+              {state.builder.cheese && (
+                <span style={{ background: '#F2F2F7', fontSize: '12px', borderRadius: '9999px', paddingLeft: '10px', paddingRight: '10px', paddingTop: '4px', paddingBottom: '4px', color: '#000' }}>
+                  {"\uD83E\uDDC0"} {state.builder.cheese}
+                </span>
+              )}
+              {state.builder.toppings.map(function(t) {
+                return (
+                  <span key={t} style={{ background: '#F2F2F7', fontSize: '12px', borderRadius: '9999px', paddingLeft: '10px', paddingRight: '10px', paddingTop: '4px', paddingBottom: '4px', color: '#000' }}>
+                    {"\uD83E\uDD6C"} {t}
+                  </span>
+                );
+              })}
+              {state.builder.condiments.map(function(c) {
+                return (
+                  <span key={c} style={{ background: '#F2F2F7', fontSize: '12px', borderRadius: '9999px', paddingLeft: '10px', paddingRight: '10px', paddingTop: '4px', paddingBottom: '4px', color: '#000' }}>
+                    {"\uD83E\uDED9"} {c}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Steps 0-4: Selection */}
+          {step < 5 && (
+            <div>
+              {/* Heading */}
+              <div style={{ fontSize: '20px', fontWeight: '600', paddingLeft: '16px', paddingRight: '16px', paddingTop: '8px', paddingBottom: '4px', color: '#000' }}>
+                Choose Your {stepNames[step]}
+              </div>
+              {isMultiSelect && (
+                <div style={{ fontSize: '13px', color: 'rgba(60,60,67,0.6)', paddingLeft: '16px', paddingRight: '16px', paddingBottom: '8px' }}>
+                  Select as many as you'd like
+                </div>
+              )}
+
+              {/* Options Card */}
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                marginLeft: '16px',
+                marginRight: '16px',
+                marginTop: '8px',
+                overflow: 'hidden'
+              }}>
+                {optionArrays[step].map(function(option, i) {
+                  var fieldKey = stepKeys[step];
+                  var isSelected;
+                  if (isMultiSelect) {
+                    isSelected = state.builder[fieldKey].indexOf(option) > -1;
+                  } else {
+                    isSelected = state.builder[fieldKey] === option;
+                  }
+
+                  return (
+                    <div key={option}>
+                      <div
+                        onClick={function() {
+                          dispatch({ type: "SET_BUILDER_SELECTION", payload: { field: fieldKey, value: option } });
+                        }}
+                        className="active:opacity-70"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          minHeight: '44px',
+                          paddingLeft: '16px',
+                          paddingRight: '16px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {isMultiSelect && (
+                          <div style={{
+                            width: '22px',
+                            height: '22px',
+                            borderRadius: '9999px',
+                            background: isSelected ? '#C23B22' : 'transparent',
+                            border: isSelected ? 'none' : '2px solid rgba(120,120,128,0.3)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            {isSelected && (
+                              <span style={{ fontSize: '13px', color: 'white', fontWeight: 'bold', lineHeight: 1 }}>{"\u2713"}</span>
+                            )}
+                          </div>
+                        )}
+                        <span style={{
+                          fontSize: '17px',
+                          color: '#000',
+                          flex: 1,
+                          marginLeft: isMultiSelect ? '12px' : '0'
+                        }}>
+                          {option}
+                        </span>
+                        {isSingleSelect && isSelected && (
+                          <Icon name="check" size={20} color="#C23B22" />
+                        )}
+                      </div>
+                      {i < optionArrays[step].length - 1 && (
+                        <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Navigation */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+                paddingTop: '16px'
+              }}>
+                {step > 0 ? (
+                  <div
+                    onClick={function() { dispatch({ type: "SET_BUILDER_STEP", payload: step - 1 }); }}
+                    className="active:opacity-70"
+                    style={{
+                      fontSize: '17px',
+                      color: '#C23B22',
+                      cursor: 'pointer',
+                      minHeight: '44px',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    Back
+                  </div>
+                ) : (
+                  <div />
+                )}
+                <div
+                  onClick={isNextDisabled() ? undefined : function() { dispatch({ type: "SET_BUILDER_STEP", payload: step + 1 }); }}
+                  className={isNextDisabled() ? "" : "active:opacity-70"}
+                  style={{
+                    fontSize: '17px',
+                    color: isNextDisabled() ? 'rgba(60,60,67,0.3)' : '#C23B22',
+                    cursor: isNextDisabled() ? 'default' : 'pointer',
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {step === 4 ? "Review" : "Next"}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 5: Review */}
+          {step === 5 && (
+            <div>
+              {/* Review Card */}
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                marginLeft: '16px',
+                marginRight: '16px',
+                marginTop: '16px',
+                overflow: 'hidden'
+              }}>
+                <div style={{ fontSize: '17px', fontWeight: '600', paddingLeft: '16px', paddingRight: '16px', paddingTop: '12px', paddingBottom: '12px' }}>
+                  Your Sandwich
+                </div>
+                <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)' }} />
+                {[
+                  { label: "Bread", value: state.builder.bread || "None" },
+                  { label: "Meat", value: state.builder.meat || "None" },
+                  { label: "Cheese", value: state.builder.cheese || "None" },
+                  { label: "Toppings", value: state.builder.toppings.length > 0 ? state.builder.toppings.join(", ") : "None" },
+                  { label: "Condiments", value: state.builder.condiments.length > 0 ? state.builder.condiments.join(", ") : "None" }
+                ].map(function(row, i, arr) {
+                  return (
+                    <div key={row.label}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        minHeight: '44px',
+                        paddingLeft: '16px',
+                        paddingRight: '16px'
+                      }}>
+                        <span style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)' }}>{row.label}</span>
+                        <span style={{ fontSize: '17px', color: '#000', textAlign: 'right', maxWidth: '60%' }}>{row.value}</span>
+                      </div>
+                      {i < arr.length - 1 && (
+                        <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Name Input */}
+              <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+                <input
+                  type="text"
+                  placeholder="Name your sandwich (optional)"
+                  value={state.builder.name}
+                  onChange={function(e) {
+                    dispatch({ type: "SET_BUILDER_SELECTION", payload: { field: "name", value: e.target.value } });
+                  }}
+                  style={{
+                    width: '100%',
+                    background: '#FFFFFF',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(60,60,67,0.12)',
+                    fontSize: '17px',
+                    padding: '12px',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              {/* Add to Order Button */}
+              <div style={{ marginTop: '16px', marginLeft: '16px', marginRight: '16px' }}>
+                <button
+                  onClick={function() {
+                    dispatch({ type: "ADD_BYO_TO_CART" });
+                    dispatch({ type: "SET_VIEW", payload: "cart" });
+                  }}
+                  className="active:opacity-70"
+                  style={{
+                    width: '100%',
+                    background: '#C23B22',
+                    color: 'white',
+                    fontSize: '17px',
+                    fontWeight: '600',
+                    height: '50px',
+                    borderRadius: '14px',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Add to Order
+                </button>
+              </div>
+
+              {/* Start Over */}
+              <div style={{ textAlign: 'center', paddingTop: '12px' }}>
+                <span
+                  onClick={function() { dispatch({ type: "RESET_BUILDER" }); }}
+                  className="active:opacity-70"
+                  style={{
+                    fontSize: '17px',
+                    color: 'rgba(60,60,67,0.6)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Start Over
+                </span>
+              </div>
+
+              {/* Back to Step 5 nav */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+                paddingTop: '16px'
+              }}>
+                <div
+                  onClick={function() { dispatch({ type: "SET_BUILDER_STEP", payload: 4 }); }}
+                  className="active:opacity-70"
+                  style={{
+                    fontSize: '17px',
+                    color: '#C23B22',
+                    cursor: 'pointer',
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  Back
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ============================================================
+       CART VIEW COMPONENT
+       ============================================================ */
+    function CartView({ state, dispatch }) {
+      var cartCount = state.cart.reduce(function(sum, item) { return sum + item.quantity; }, 0);
+      var itemLabel = cartCount === 1 ? "1 item" : cartCount + " items";
+
+      // Empty State
+      if (state.cart.length === 0 && !state.orderConfirmation) {
+        return (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 'calc(100vh - 44px - 49px - env(safe-area-inset-top) - env(safe-area-inset-bottom))',
+            padding: '20px'
+          }}>
+            <Icon name="shopping-cart" size={48} color="rgba(60,60,67,0.3)" />
+            <div style={{ fontSize: '20px', fontWeight: '600', color: '#000', marginTop: '16px' }}>
+              Your order is empty
+            </div>
+            <div style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)', marginTop: '6px', textAlign: 'center', paddingLeft: '32px', paddingRight: '32px' }}>
+              Add items from the menu or build your own sandwich
+            </div>
+            <button
+              onClick={function() { dispatch({ type: "SET_VIEW", payload: "menu" }); }}
+              className="active:opacity-70"
+              style={{
+                marginTop: '20px',
+                background: '#C23B22',
+                color: 'white',
+                fontSize: '17px',
+                fontWeight: '600',
+                height: '50px',
+                paddingLeft: '32px',
+                paddingRight: '32px',
+                borderRadius: '14px',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              Browse Menu
+            </button>
+          </div>
+        );
+      }
+
+      // Order Confirmation State
+      if (state.orderConfirmation) {
+        var conf = state.orderConfirmation;
+        return (
+          <div style={{ paddingLeft: '24px', paddingRight: '24px', paddingBottom: '100px' }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingTop: '40px'
+            }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '9999px',
+                background: '#34C759',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Icon name="check" size={32} color="white" />
+              </div>
+              <div style={{ fontSize: '22px', fontWeight: '700', color: '#000', marginTop: '16px' }}>
+                Order Received!
+              </div>
+              <div style={{ fontSize: '17px', color: 'rgba(60,60,67,0.6)', marginTop: '4px' }}>
+                Order #{conf.orderNumber}
+              </div>
+            </div>
+
+            {/* Order Items Card */}
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: '10px',
+              width: '100%',
+              marginTop: '20px',
+              overflow: 'hidden'
+            }}>
+              {conf.items.map(function(item, i) {
+                return (
+                  <div key={item.cartId || i}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      minHeight: '44px',
+                      paddingLeft: '16px',
+                      paddingRight: '16px'
+                    }}>
+                      <span style={{ fontSize: '17px', color: '#000' }}>{item.name}</span>
+                      <span style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)' }}>{"\u00D7 "}{item.quantity}</span>
+                    </div>
+                    {i < conf.items.length - 1 && (
+                      <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Note Card */}
+            {conf.note && (
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                width: '100%',
+                marginTop: '10px',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+                paddingTop: '12px',
+                paddingBottom: '12px'
+              }}>
+                <div style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(60,60,67,0.6)' }}>Note</div>
+                <div style={{ fontSize: '15px', color: '#000', marginTop: '4px' }}>{conf.note}</div>
+              </div>
+            )}
+
+            {/* Info Text */}
+            <div style={{ fontSize: '13px', color: 'rgba(60,60,67,0.6)', textAlign: 'center', marginTop: '16px' }}>
+              We're preparing your order! Call or text us for pickup time.
+            </div>
+
+            {/* Contact Buttons */}
+            <a
+              href="tel:9142383553"
+              className="active:opacity-70"
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'center',
+                background: '#C23B22',
+                color: 'white',
+                fontSize: '17px',
+                fontWeight: '600',
+                height: '50px',
+                lineHeight: '50px',
+                borderRadius: '14px',
+                textDecoration: 'none',
+                marginTop: '12px',
+                boxSizing: 'border-box'
+              }}
+            >
+              Call (914) 238-3553
+            </a>
+            <a
+              href="sms:9143803532"
+              className="active:opacity-70"
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'center',
+                background: '#2D5016',
+                color: 'white',
+                fontSize: '17px',
+                fontWeight: '600',
+                height: '50px',
+                lineHeight: '50px',
+                borderRadius: '14px',
+                textDecoration: 'none',
+                marginTop: '10px',
+                boxSizing: 'border-box'
+              }}
+            >
+              Text (914) 380-3532
+            </a>
+
+            {/* New Order */}
+            <div style={{ textAlign: 'center', paddingTop: '16px' }}>
+              <span
+                onClick={function() {
+                  dispatch({ type: "CLEAR_CONFIRMATION" });
+                  dispatch({ type: "SET_VIEW", payload: "home" });
+                }}
+                className="active:opacity-70"
+                style={{ fontSize: '17px', color: 'rgba(60,60,67,0.6)', cursor: 'pointer' }}
+              >
+                New Order
+              </span>
+            </div>
+          </div>
+        );
+      }
+
+      // Active Cart State
+      return (
+        <div style={{ paddingBottom: '100px' }}>
+          {/* Title */}
+          <div style={{ fontSize: '22px', fontWeight: '700', textAlign: 'center', paddingTop: '16px', color: '#000' }}>
+            Your Order
+          </div>
+          <div style={{ fontSize: '13px', color: 'rgba(60,60,67,0.6)', textAlign: 'center', marginTop: '2px' }}>
+            {itemLabel}
+          </div>
+
+          {/* Cart Items Card */}
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '10px',
+            marginLeft: '16px',
+            marginRight: '16px',
+            marginTop: '16px',
+            overflow: 'hidden'
+          }}>
+            {state.cart.map(function(item, i) {
+              return (
+                <div key={item.cartId}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: '60px',
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                    paddingLeft: '16px',
+                    paddingRight: '8px'
+                  }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '17px', fontWeight: '600', color: '#000' }}>{item.name}</div>
+                      {item.description && (
+                        <div style={{
+                          fontSize: '13px',
+                          color: 'rgba(60,60,67,0.6)',
+                          marginTop: '2px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {item.description}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
+                      <div
+                        onClick={function() {
+                          dispatch({ type: "UPDATE_QUANTITY", payload: { cartId: item.cartId, quantity: item.quantity - 1 } });
+                        }}
+                        className="active:opacity-70"
+                        style={{
+                          cursor: 'pointer',
+                          minWidth: '44px',
+                          minHeight: '44px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Icon name="minus-circle" size={22} color="#C23B22" />
+                      </div>
+                      <span style={{ fontSize: '17px', fontWeight: '600', color: '#000', minWidth: '28px', textAlign: 'center' }}>
+                        {item.quantity}
+                      </span>
+                      <div
+                        onClick={function() {
+                          dispatch({ type: "UPDATE_QUANTITY", payload: { cartId: item.cartId, quantity: item.quantity + 1 } });
+                        }}
+                        className="active:opacity-70"
+                        style={{
+                          cursor: 'pointer',
+                          minWidth: '44px',
+                          minHeight: '44px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Icon name="plus-circle" size={22} color="#C23B22" />
+                      </div>
+                    </div>
+                  </div>
+                  {i < state.cart.length - 1 && (
+                    <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Special Instructions */}
+          <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(60,60,67,0.6)', marginBottom: '6px' }}>
+              Special Instructions
+            </div>
+            <textarea
+              value={state.cartNote}
+              onChange={function(e) { dispatch({ type: "SET_CART_NOTE", payload: e.target.value }); }}
+              placeholder="Allergies, modifications, pickup time..."
+              style={{
+                width: '100%',
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                border: '1px solid rgba(60,60,67,0.12)',
+                fontSize: '17px',
+                padding: '12px',
+                outline: 'none',
+                boxSizing: 'border-box',
+                resize: 'none',
+                minHeight: '80px',
+                fontFamily: 'inherit'
+              }}
+            />
+          </div>
+
+          {/* Contact Section */}
+          <div style={{ marginTop: '20px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={{
+              fontSize: '13px',
+              fontWeight: '600',
+              color: 'rgba(60,60,67,0.6)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              marginBottom: '8px'
+            }}>
+              Send Your Order
+            </div>
+            <a
+              href="tel:9142383553"
+              className="active:opacity-70"
+              style={{ textDecoration: 'none', display: 'block' }}
+            >
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: '50px',
+                paddingLeft: '16px',
+                paddingRight: '16px'
+              }}>
+                <Icon name="phone" size={20} color="#C23B22" />
+                <span style={{ flex: 1, marginLeft: '12px', fontSize: '17px', color: '#000' }}>Call to order</span>
+                <Icon name="chevron-right" size={18} color="#8E8E93" />
+              </div>
+            </a>
+            <a
+              href="sms:9143803532"
+              className="active:opacity-70"
+              style={{ textDecoration: 'none', display: 'block', marginTop: '8px' }}
+            >
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: '50px',
+                paddingLeft: '16px',
+                paddingRight: '16px'
+              }}>
+                <Icon name="message-square" size={20} color="#2D5016" />
+                <span style={{ flex: 1, marginLeft: '12px', fontSize: '17px', color: '#000' }}>Text your order</span>
+                <Icon name="chevron-right" size={18} color="#8E8E93" />
+              </div>
+            </a>
+          </div>
+
+          {/* Place Order Button */}
+          <div style={{ marginTop: '16px', marginLeft: '16px', marginRight: '16px' }}>
+            <button
+              onClick={function() { dispatch({ type: "PLACE_ORDER" }); }}
+              className="active:opacity-70"
+              style={{
+                width: '100%',
+                background: '#C23B22',
+                color: 'white',
+                fontSize: '17px',
+                fontWeight: '600',
+                height: '50px',
+                borderRadius: '14px',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              Place Order
+            </button>
+          </div>
+
+          {/* Clear Order */}
+          <div style={{ textAlign: 'center', paddingTop: '12px' }}>
+            <span
+              onClick={function() { dispatch({ type: "CLEAR_CART" }); }}
+              className="active:opacity-70"
+              style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)', cursor: 'pointer' }}
+            >
+              Clear Order
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================================================
        MAIN APP COMPONENT
        ============================================================ */
     function LangesApp() {
@@ -705,6 +2407,20 @@
         }
       }, [state.activeView]);
 
+      // Scroll to top on menu category change
+      React.useEffect(function() {
+        if (contentRef.current) {
+          contentRef.current.scrollTop = 0;
+        }
+      }, [state.menuCategory]);
+
+      // Scroll to top on builder step change
+      React.useEffect(function() {
+        if (contentRef.current) {
+          contentRef.current.scrollTop = 0;
+        }
+      }, [state.builder.step]);
+
       // Clear toast after 1500ms
       React.useEffect(function() {
         if (state.toastMessage) {
@@ -719,16 +2435,16 @@
       var viewContent;
       switch (state.activeView) {
         case "home":
-          viewContent = <PlaceholderView title="Home" />;
+          viewContent = <HomeView state={state} dispatch={dispatch} />;
           break;
         case "menu":
-          viewContent = <PlaceholderView title="Menu" />;
+          viewContent = <MenuView state={state} dispatch={dispatch} />;
           break;
         case "builder":
-          viewContent = <PlaceholderView title="Build Your Own" />;
+          viewContent = <BuilderView state={state} dispatch={dispatch} />;
           break;
         case "cart":
-          viewContent = <PlaceholderView title="Your Order" />;
+          viewContent = <CartView state={state} dispatch={dispatch} />;
           break;
         case "catering":
           viewContent = <PlaceholderView title="Catering" />;
