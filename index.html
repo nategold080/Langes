@@ -2392,6 +2392,316 @@
     }
 
     /* ============================================================
+       CATERING VIEW COMPONENT
+       ============================================================ */
+    function CateringView({ state, dispatch }) {
+      var cf = state.cateringForm;
+      var isSubmitDisabled = !cf.name || !cf.phone || !cf.date;
+
+      function toggleCategory(catId) {
+        var cats = cf.categories;
+        var idx = cats.indexOf(catId);
+        var updated;
+        if (idx > -1) {
+          updated = cats.filter(function(c) { return c !== catId; });
+        } else {
+          updated = cats.concat([catId]);
+        }
+        dispatch({ type: "UPDATE_CATERING_FORM", payload: { categories: updated } });
+      }
+
+      var labelStyle = { fontSize: '13px', fontWeight: '600', color: 'rgba(60,60,67,0.6)', marginBottom: '6px' };
+      var inputStyle = {
+        width: '100%',
+        background: '#FFFFFF',
+        borderRadius: '10px',
+        border: '1px solid rgba(60,60,67,0.12)',
+        fontSize: '17px',
+        padding: '12px',
+        outline: 'none',
+        boxSizing: 'border-box'
+      };
+
+      return (
+        <div style={{ paddingBottom: '100px' }}>
+          {/* Title */}
+          <div style={{ fontSize: '22px', fontWeight: '700', textAlign: 'center', paddingTop: '16px', color: '#000' }}>
+            Catering
+          </div>
+          <div style={{ fontSize: '15px', color: 'rgba(60,60,67,0.6)', textAlign: 'center', marginTop: '4px' }}>
+            Let us cater your next event
+          </div>
+
+          {/* WHAT WE OFFER */}
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            color: 'rgba(60,60,67,0.6)',
+            paddingLeft: '16px',
+            paddingTop: '24px',
+            paddingBottom: '8px',
+            letterSpacing: '0.5px'
+          }}>
+            What We Offer
+          </div>
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '10px',
+            marginLeft: '16px',
+            marginRight: '16px',
+            overflow: 'hidden'
+          }}>
+            {CATERING_CATEGORIES.map(function(cat, i) {
+              return (
+                <div key={cat.id}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: '50px',
+                    paddingLeft: '16px',
+                    paddingRight: '16px',
+                    paddingTop: '10px',
+                    paddingBottom: '10px'
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '17px', fontWeight: '600', color: '#000' }}>{cat.name}</div>
+                      <div style={{ fontSize: '13px', color: 'rgba(60,60,67,0.6)', marginTop: '1px' }}>{cat.description}</div>
+                    </div>
+                  </div>
+                  {i < CATERING_CATEGORIES.length - 1 && (
+                    <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* GET IN TOUCH */}
+          <div style={{
+            fontSize: '13px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            color: 'rgba(60,60,67,0.6)',
+            paddingLeft: '16px',
+            paddingTop: '24px',
+            paddingBottom: '8px',
+            letterSpacing: '0.5px'
+          }}>
+            Get In Touch
+          </div>
+
+          {/* Event Date */}
+          <div style={{ marginTop: '8px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={labelStyle}>Event Date</div>
+            <input
+              type="date"
+              value={cf.date}
+              onChange={function(e) { dispatch({ type: "UPDATE_CATERING_FORM", payload: { date: e.target.value } }); }}
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Number of Guests */}
+          <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={labelStyle}>Number of Guests</div>
+            <input
+              type="number"
+              min="1"
+              value={cf.guests}
+              onChange={function(e) { dispatch({ type: "UPDATE_CATERING_FORM", payload: { guests: e.target.value } }); }}
+              placeholder="Approximate headcount"
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Interested In */}
+          <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={labelStyle}>Interested In</div>
+            <div style={{ fontSize: '12px', color: 'rgba(60,60,67,0.3)', marginBottom: '6px' }}>Select all that apply</div>
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: '10px',
+              overflow: 'hidden'
+            }}>
+              {CATERING_CATEGORIES.map(function(cat, i) {
+                var isSelected = cf.categories.indexOf(cat.id) > -1;
+                return (
+                  <div key={cat.id}>
+                    <div
+                      onClick={function() { toggleCategory(cat.id); }}
+                      className="active:opacity-70"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        minHeight: '44px',
+                        paddingLeft: '16px',
+                        paddingRight: '16px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{
+                        width: '22px',
+                        height: '22px',
+                        borderRadius: '9999px',
+                        background: isSelected ? '#C23B22' : 'transparent',
+                        border: isSelected ? 'none' : '2px solid rgba(120,120,128,0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        {isSelected && (
+                          <span style={{ fontSize: '13px', color: 'white', fontWeight: 'bold', lineHeight: 1 }}>{"\u2713"}</span>
+                        )}
+                      </div>
+                      <span style={{ fontSize: '17px', color: '#000', marginLeft: '12px', flex: 1 }}>{cat.name}</span>
+                    </div>
+                    {i < CATERING_CATEGORIES.length - 1 && (
+                      <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.12)', marginLeft: '16px' }} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Dietary Needs */}
+          <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={labelStyle}>Dietary Needs</div>
+            <input
+              type="text"
+              value={cf.dietary}
+              onChange={function(e) { dispatch({ type: "UPDATE_CATERING_FORM", payload: { dietary: e.target.value } }); }}
+              placeholder="Vegetarian, gluten-free, allergies..."
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Additional Notes */}
+          <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={labelStyle}>Additional Notes</div>
+            <textarea
+              value={cf.notes}
+              onChange={function(e) { dispatch({ type: "UPDATE_CATERING_FORM", payload: { notes: e.target.value } }); }}
+              placeholder="Tell us about your event..."
+              style={{
+                width: '100%',
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                border: '1px solid rgba(60,60,67,0.12)',
+                fontSize: '17px',
+                padding: '12px',
+                outline: 'none',
+                boxSizing: 'border-box',
+                resize: 'none',
+                minHeight: '80px',
+                fontFamily: 'inherit'
+              }}
+            />
+          </div>
+
+          {/* Your Name */}
+          <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={labelStyle}>Your Name</div>
+            <input
+              type="text"
+              value={cf.name}
+              onChange={function(e) { dispatch({ type: "UPDATE_CATERING_FORM", payload: { name: e.target.value } }); }}
+              placeholder="Full name"
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Phone Number */}
+          <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={labelStyle}>Phone Number</div>
+            <input
+              type="tel"
+              value={cf.phone}
+              onChange={function(e) { dispatch({ type: "UPDATE_CATERING_FORM", payload: { phone: e.target.value } }); }}
+              placeholder="(914) 555-1234"
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Email */}
+          <div style={{ marginTop: '12px', marginLeft: '16px', marginRight: '16px' }}>
+            <div style={labelStyle}>Email (Optional)</div>
+            <input
+              type="email"
+              value={cf.email}
+              onChange={function(e) { dispatch({ type: "UPDATE_CATERING_FORM", payload: { email: e.target.value } }); }}
+              placeholder="you@email.com"
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Send Inquiry Button */}
+          <div style={{ marginTop: '20px', marginLeft: '16px', marginRight: '16px' }}>
+            <button
+              onClick={isSubmitDisabled ? undefined : function() {
+                window.location.href = "tel:9142383553";
+                dispatch({ type: "RESET_CATERING_FORM" });
+              }}
+              className={isSubmitDisabled ? "" : "active:opacity-70"}
+              style={{
+                width: '100%',
+                background: '#C23B22',
+                color: 'white',
+                fontSize: '17px',
+                fontWeight: '600',
+                height: '50px',
+                borderRadius: '14px',
+                border: 'none',
+                cursor: isSubmitDisabled ? 'default' : 'pointer',
+                opacity: isSubmitDisabled ? 0.5 : 1
+              }}
+            >
+              Send Inquiry
+            </button>
+          </div>
+
+          {/* Info text */}
+          <div style={{
+            fontSize: '13px',
+            color: 'rgba(60,60,67,0.6)',
+            textAlign: 'center',
+            marginTop: '12px',
+            paddingLeft: '16px',
+            paddingRight: '16px'
+          }}>
+            We'll call you back to confirm details and pricing.
+          </div>
+
+          {/* Contact alternative */}
+          <div style={{ marginTop: '16px', marginLeft: '16px', marginRight: '16px' }}>
+            <a
+              href="tel:9142383553"
+              className="active:opacity-70"
+              style={{ textDecoration: 'none', display: 'block' }}
+            >
+              <div style={{
+                background: '#FFFFFF',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: '50px',
+                paddingLeft: '16px',
+                paddingRight: '16px'
+              }}>
+                <Icon name="phone" size={20} color="#C23B22" />
+                <span style={{ flex: 1, marginLeft: '12px', fontSize: '17px', color: '#000' }}>Call us directly</span>
+                <Icon name="chevron-right" size={18} color="#8E8E93" />
+              </div>
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================================================
        MAIN APP COMPONENT
        ============================================================ */
     function LangesApp() {
@@ -2447,7 +2757,7 @@
           viewContent = <CartView state={state} dispatch={dispatch} />;
           break;
         case "catering":
-          viewContent = <PlaceholderView title="Catering" />;
+          viewContent = <CateringView state={state} dispatch={dispatch} />;
           break;
         default:
           viewContent = <PlaceholderView title="Home" />;
