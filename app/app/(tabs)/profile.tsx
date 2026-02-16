@@ -133,6 +133,35 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Account */}
+        <Text style={styles.sectionLabel}>Account</Text>
+        <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => router.push('/(auth)/login')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="person-outline" size={22} color={Colors.deliRed} />
+            <View style={styles.rowContent}>
+              <Text style={styles.rowTitle}>Sign In / Create Account</Text>
+              <Text style={styles.rowSubtitle}>Save orders and preferences</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.textSecondary} />
+          </TouchableOpacity>
+          <View style={styles.separator} />
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => router.push('/privacy')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="shield-checkmark-outline" size={22} color={Colors.deliRed} />
+            <View style={styles.rowContent}>
+              <Text style={styles.rowTitle}>Privacy Policy</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+
         {/* Hours */}
         <Text style={styles.sectionLabel}>Store Hours</Text>
         <View style={styles.card}>
