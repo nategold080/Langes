@@ -184,9 +184,12 @@ export default function ProfileScreen() {
             <>
               {recentOrders.map((order, i) => (
                 <View key={order.id}>
-                  <View
+                  <TouchableOpacity
                     style={styles.orderHistoryRow}
+                    onPress={() => router.push(`/order/${order.orderNumber}`)}
+                    activeOpacity={0.7}
                     accessibilityLabel={order.orderNumber + ", " + order.itemCount + " items"}
+                    accessibilityRole="button"
                   >
                     <Ionicons name="receipt-outline" size={22} color={Colors.deliRed} />
                     <View style={styles.rowContent}>
@@ -195,7 +198,8 @@ export default function ProfileScreen() {
                         {order.itemCount} {order.itemCount === 1 ? 'item' : 'items'} · {formatRelativeTime(order.timestamp)}
                       </Text>
                     </View>
-                  </View>
+                    <Ionicons name="chevron-forward" size={18} color={Colors.textSecondary} />
+                  </TouchableOpacity>
                   {i < recentOrders.length - 1 && <View style={styles.separator} />}
                 </View>
               ))}
